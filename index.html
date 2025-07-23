@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Shooter</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --text-color: #f0f0f0;
+            --card-bg: #2d2d2d;
+            --border-color: #444;
+            --button-bg: #4CAF50;
+            --button-hover: #45a049;
+            --good-table-bg: rgba(144, 238, 144, 0.1);
+            --irrelevant-table-bg: rgba(255, 182, 193, 0.1);
+            --table-header-bg: #333;
+            --table-row-even: #3a3a3a;
+            --shortcut-bg: #333;
+            --notification-bg: #333;
+        }
+        
+        body.light-mode {
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --card-bg: white;
+            --border-color: #ddd;
+            --button-bg: #4CAF50;
+            --button-hover: #45a049;
+            --good-table-bg: rgba(144, 238, 144, 0.2);
+            --irrelevant-table-bg: rgba(255, 182, 193, 0.2);
+            --table-header-bg: #f2f2f2;
+            --table-row-even: #f9f9f9;
+            --shortcut-bg: #e9f7ef;
+            --notification-bg: #333;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        h1, h2 {
+            color: var(--text-color);
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+        .theme-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+            background-color: var(--card-bg);
+            padding: 8px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+        .london-time {
+            position: absolute;
+            top: 10px;
+            right: 250px;
+            background-color: var(--card-bg);
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            z-index: 100;
+        }
+        .london-time h3 {
+            color: var(--text-color);
+            margin: 0;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: normal;
+        }
+        .timer {
+            font-size: 20px;
+            font-weight: 500;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            color: var(--text-color);
+            letter-spacing: 1px;
+        }
+        .input-section {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+        }
+        .current-site {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+        .current-site h2 {
+            margin-top: 0;
+        }
+        .site-display {
+            font-size: 18px;
+            margin: 15px 0;
+            word-break: break-all;
+            text-align: center;
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .tables-section {
+            display: flex;
+            gap: 20px;
+        }
+        .table-container {
+            flex: 1;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+        }
+        .table-container:first-child {
+            background-color: var(--good-table-bg);
+        }
+        .table-container:last-child {
+            background-color: var(--irrelevant-table-bg);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: var(--table-header-bg);
+            color: var(--text-color);
+        }
+        tr:nth-child(even) {
+            background-color: var(--table-row-even);
+        }
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        button {
+            padding: 10px 18px;
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            margin: 0 3px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            resize: vertical;
+            font-family: inherit;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        .shortcut-info {
+            background-color: var(--shortcut-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .shortcut-info ul {
+            padding-left: 20px;
+        }
+        
+        .shortcut-info li {
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .shortcut-key {
+            font-weight: bold;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            margin: 0 5px;
+            display: inline-block;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--notification-bg);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .table-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .combined-table-container {
+            margin-top: 25px;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn:hover {
+            background-color: rgba(150, 150, 150, 0.1);
+        }
+        
+        .filter-btn.active {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        
+        .good-site-row {
+            background-color: rgba(129, 199, 132, 0.1) !important;
+        }
+        
+        .irrelevant-site-row {
+            background-color: rgba(239, 154, 154, 0.1) !important;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 8px 15px;
+            background-color: var(--card-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+        
+        .nav-links a:hover {
+            background-color: rgba(150, 150, 150, 0.1);
+        }
+        
+        .nav-links a.active {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        
+        /* London time is now positioned at the top right */
+        /* The best-time class is kept for backward compatibility */
+        .best-time {
+            display: none; /* Hide the old timer position */
+        }
+    </style>
+</head>
+<body>
+    <div id="notification" class="notification"></div>
+    <div class="container">
+        <div class="london-time">
+            <h3>London Time</h3>
+            <div class="timer" id="timer">00:00:00</div>
+        </div>
+        <div class="theme-toggle">
+            <span style="color: var(--text-color);">Dark</span>
+            <label class="switch">
+                <input type="checkbox" id="theme-switch">
+                <span class="slider"></span>
+            </label>
+            <span style="color: var(--text-color);">Light</span>
+        </div>
+        <h1>Website Shooter</h1>
+        
+        <div class="nav-links">
+            <a href="index.html" class="active">Main Tool</a>
+            <a href="compare.html">Compare & Filter</a>
+        </div>
+        
+        <div class="shortcut-info">
+            <p>Keyboard shortcuts:</p>
+            <ul>
+                <li><span class="shortcut-key" style="border: 1px solid #FFB74D; color: #FFB74D; background-color: rgba(255, 183, 77, 0.1);">Ctrl + Q</span> - <span style="color: #FFB74D;">Open current site in a new tab</span></li>
+                <li><span class="shortcut-key" style="border: 1px solid #81C784; color: #81C784; background-color: rgba(129, 199, 132, 0.1);">Ctrl + A</span> - <span style="color: #81C784;">Add to Good Sites</span></li>
+                <li><span class="shortcut-key" style="border: 1px solid #EF9A9A; color: #EF9A9A; background-color: rgba(239, 154, 154, 0.1);">Ctrl + S</span> - <span style="color: #EF9A9A;">Add to Irrelevant Sites</span></li>
+
+            </ul>
+        </div>
+        
+        <div class="input-section">
+            <h2>Add Websites</h2>
+            <p>Enter one URL per line (up to 50 sites):</p>
+            <textarea id="website-input" placeholder="https://example.com
+https://another-example.com"></textarea>
+            <button id="load-sites">Load Sites</button>
+        </div>
+        
+        <div class="current-site">
+            <h2>Current Site</h2>
+            <div id="current-site-display" class="site-display">No site loaded</div>
+            <div class="controls">
+                <button id="next-site">Next Site</button>
+                <button id="next-and-open" style="background-color: #FFB74D;">Next Site & Open</button>
+                <button id="open-site" style="background-color: #FFB74D;">Open Site (Ctrl+Q)</button>
+                <button id="add-good" style="background-color: #81C784;">Add to Good (Ctrl+A)</button>
+                <button id="add-irrelevant" style="background-color: #EF9A9A;">Add to Irrelevant (Ctrl+S)</button>
+            </div>
+        </div>
+        
+        <div class="tables-section">
+            <div class="table-container">
+                <h2>Good Sites</h2>
+                <table id="good-sites-table">
+                    <thead>
+                        <tr>
+                            <th>URL</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="table-actions">
+                    <button id="copy-good-sites">Copy Table</button>
+                    <button id="clear-good-sites">Delete Table</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <h2>Irrelevant Sites</h2>
+                <table id="irrelevant-sites-table">
+                    <thead>
+                        <tr>
+                            <th>URL</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="table-actions">
+                    <button id="copy-irrelevant-sites">Copy Table</button>
+                    <button id="clear-irrelevant-sites">Delete Table</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="combined-table-container">
+            <h2>Combined Sites (Chronological Order)</h2>
+            <div class="filter-controls">
+                <button id="show-all" class="filter-btn active">Show All</button>
+                <button id="show-good" class="filter-btn">Show Good Only</button>
+                <button id="show-irrelevant" class="filter-btn">Show Irrelevant Only</button>
+            </div>
+            <table id="combined-sites-table">
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th>Type</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="table-actions">
+                <button id="copy-combined-sites">Copy Table</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // State variables
+            let websites = [];
+            let currentIndex = -1;
+            let goodSites = [];
+            let irrelevantSites = [];
+            let combinedSites = []; // Array to store sites in chronological order with type info
+            
+            // London time variables
+            let clockInterval;
+            
+            // DOM elements
+            const websiteInput = document.getElementById('website-input');
+            const loadSitesBtn = document.getElementById('load-sites');
+            const currentSiteDisplay = document.getElementById('current-site-display');
+            const nextSiteBtn = document.getElementById('next-site');
+            const nextAndOpenBtn = document.getElementById('next-and-open');
+            const openSiteBtn = document.getElementById('open-site');
+            const addGoodBtn = document.getElementById('add-good');
+            const addIrrelevantBtn = document.getElementById('add-irrelevant');
+            const goodSitesTable = document.getElementById('good-sites-table').querySelector('tbody');
+            const irrelevantSitesTable = document.getElementById('irrelevant-sites-table').querySelector('tbody');
+            const combinedSitesTable = document.getElementById('combined-sites-table').querySelector('tbody');
+            
+            // Filter buttons
+            const showAllBtn = document.getElementById('show-all');
+            const showGoodBtn = document.getElementById('show-good');
+            const showIrrelevantBtn = document.getElementById('show-irrelevant');
+            
+            // Clock element
+            const timerElement = document.getElementById('timer');
+            
+            // Table action buttons
+            const copyGoodSitesBtn = document.getElementById('copy-good-sites');
+            const clearGoodSitesBtn = document.getElementById('clear-good-sites');
+            const copyIrrelevantSitesBtn = document.getElementById('copy-irrelevant-sites');
+            const clearIrrelevantSitesBtn = document.getElementById('clear-irrelevant-sites');
+            const copyCombinedSitesBtn = document.getElementById('copy-combined-sites');
+            
+            // Track window focus for better tab management
+            let windowHasFocus = true;
+            window.addEventListener('focus', function() {
+                windowHasFocus = true;
+            });
+            window.addEventListener('blur', function() {
+                windowHasFocus = false;
+            });
+            
+            // Load sites from input
+            loadSitesBtn.addEventListener('click', function() {
+                const input = websiteInput.value.trim();
+                if (!input) return;
+                
+                websites = input.split('\n')
+                    .map(url => url.trim())
+                    .filter(url => url !== '')
+                    .map(url => {
+                        // Add https:// if no protocol is specified
+                        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                            return 'https://' + url;
+                        }
+                        return url;
+                    });
+                
+                if (websites.length > 0) {
+                    currentIndex = 0;
+                    updateCurrentSiteDisplay();
+                }
+            });
+            
+            // Next site button
+            nextSiteBtn.addEventListener('click', function() {
+                goToNextSite();
+            });
+            
+            // Next site and open button
+            nextAndOpenBtn.addEventListener('click', function() {
+                goToNextSiteAndOpen();
+            });
+            
+            // Open site in new tab
+            openSiteBtn.addEventListener('click', function() {
+                openCurrentSite();
+            });
+            
+            // Add to good sites
+            addGoodBtn.addEventListener('click', function() {
+                addToGoodSites();
+            });
+            
+            // Add to irrelevant sites
+            addIrrelevantBtn.addEventListener('click', function() {
+                addToIrrelevantSites();
+            });
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(event) {
+                // Only process shortcuts when this window has focus
+                if (windowHasFocus) {
+                    // Shift key combinations are kept for backward compatibility
+                    if (event.shiftKey) {
+                        if (event.key === 'D' || event.key === 'd') {
+                            openCurrentSite();
+                            event.preventDefault();
+                        } else if (event.key === 'S' || event.key === 's') {
+                            addToGoodSites();
+                            event.preventDefault();
+                        } else if (event.key === 'A' || event.key === 'a') {
+                            addToIrrelevantSites();
+                            event.preventDefault();
+                        } else if (event.key === 'N' || event.key === 'n') {
+                            goToNextSiteAndOpen();
+                            event.preventDefault();
+                        }
+                    }
+                    
+                    // Handle Ctrl key combinations with custom shortcuts and allow Ctrl+C and Ctrl+V
+                    if (event.ctrlKey) {
+                        // Custom shortcuts
+                        if (event.key === 'q' || event.key === 'Q') {
+                            // Ctrl+Q to open the loaded site
+                            openCurrentSite();
+                            showNotification('Opening current site');
+                            event.preventDefault();
+                            return false;
+                        } else if (event.key === 'a' || event.key === 'A') {
+                            // Ctrl+A to add to good sites
+                            addToGoodSites();
+                            showNotification('Added to good sites');
+                            event.preventDefault();
+                            return false;
+                        } else if (event.key === 's' || event.key === 'S') {
+                            // Ctrl+S to add to irrelevant sites
+                            addToIrrelevantSites();
+                            showNotification('Added to irrelevant sites');
+                            event.preventDefault();
+                            return false;
+
+                        }
+                        // Allow Ctrl+C, Ctrl+V, Ctrl+F, and Ctrl+R
+                        else if (event.key === 'c' || event.key === 'C' || 
+                                 event.key === 'v' || event.key === 'V' || 
+                                 event.key === 'f' || event.key === 'F' || 
+                                 event.key === 'r' || event.key === 'R') {
+                            // Let these pass through
+                            return true;
+                        }
+                        // Show notification for other prevented shortcuts
+                        else if (event.key === 'w' || event.key === 'W') {
+                            showNotification('Ctrl+W (close tab) prevented - may not work in all browsers');
+                        } else if (event.key === 'p' || event.key === 'P') {
+                            showNotification('Ctrl+P (print) prevented');
+                        } else {
+                            showNotification('Ctrl+' + event.key.toUpperCase() + ' prevented');
+                        }
+                        
+                        // Prevent default for other Ctrl combinations
+                        event.preventDefault();
+                        return false;
+                    }
+                }
+            });
+            
+            // Right-click is now enabled - removed the context menu prevention
+            
+            // Listen for window focus to detect when user returns from a tab
+            window.addEventListener('focus', function() {
+                // This will trigger when user closes a tab with Ctrl+W and returns to this app
+                console.log('Window regained focus - user may have returned from a tab');
+                showNotification('Welcome back! Use Ctrl+A to mark as good or Ctrl+S for irrelevant');
+            });
+            
+            // Notification system
+            const notification = document.getElementById('notification');
+            let notificationTimeout;
+            
+            function showNotification(message, duration = 3000) {
+                // Clear any existing timeout
+                if (notificationTimeout) {
+                    clearTimeout(notificationTimeout);
+                }
+                
+                // Set message and show notification
+                notification.textContent = message;
+                notification.classList.add('show');
+                
+                // Hide after duration
+                notificationTimeout = setTimeout(function() {
+                    notification.classList.remove('show');
+                }, duration);
+            }
+            
+            // Helper functions
+            function goToNextSite() {
+                if (websites.length === 0) return false;
+                
+                currentIndex = (currentIndex + 1) % websites.length;
+                updateCurrentSiteDisplay();
+                return true;
+            }
+            
+            function goToNextSiteAndOpen() {
+                if (goToNextSite()) {
+                    openCurrentSite();
+                }
+            }
+            
+            function updateCurrentSiteDisplay() {
+                if (currentIndex >= 0 && currentIndex < websites.length) {
+                    currentSiteDisplay.textContent = websites[currentIndex];
+                } else {
+                    currentSiteDisplay.textContent = 'No site loaded';
+                }
+            }
+            
+            function openCurrentSite() {
+                if (currentIndex >= 0 && currentIndex < websites.length) {
+                    window.open(websites[currentIndex], '_blank');
+                }
+            }
+            
+            function addToGoodSites() {
+                if (currentIndex >= 0 && currentIndex < websites.length) {
+                    const site = websites[currentIndex];
+                    
+                    // Check if site is already in good sites
+                    if (!goodSites.includes(site)) {
+                        goodSites.push(site);
+                        updateGoodSitesTable();
+                        
+                        // Add to combined sites with type info
+                        combinedSites.push({
+                            url: site,
+                            type: 'good'
+                        });
+                        updateCombinedSitesTable();
+                        
+                        // Save to localStorage
+                        saveToLocalStorage();
+                    }
+                    
+                    // Move to next site
+                    if (websites.length > 1) {
+                        websites.splice(currentIndex, 1);
+                        if (currentIndex >= websites.length) {
+                            currentIndex = 0;
+                        }
+                        updateCurrentSiteDisplay();
+                    } else {
+                        websites = [];
+                        currentIndex = -1;
+                        currentSiteDisplay.textContent = 'No site loaded';
+                    }
+                }
+            }
+            
+            function addToIrrelevantSites() {
+                if (currentIndex >= 0 && currentIndex < websites.length) {
+                    const site = websites[currentIndex];
+                    
+                    // Check if site is already in irrelevant sites
+                    if (!irrelevantSites.includes(site)) {
+                        irrelevantSites.push(site);
+                        updateIrrelevantSitesTable();
+                        
+                        // Add to combined sites with type info
+                        combinedSites.push({
+                            url: site,
+                            type: 'irrelevant'
+                        });
+                        updateCombinedSitesTable();
+                        
+                        // Save to localStorage
+                        saveToLocalStorage();
+                    }
+                    
+                    // Move to next site
+                    if (websites.length > 1) {
+                        websites.splice(currentIndex, 1);
+                        if (currentIndex >= websites.length) {
+                            currentIndex = 0;
+                        }
+                        updateCurrentSiteDisplay();
+                    } else {
+                        websites = [];
+                        currentIndex = -1;
+                        currentSiteDisplay.textContent = 'No site loaded';
+                    }
+                }
+            }
+            
+            function updateGoodSitesTable() {
+                goodSitesTable.innerHTML = '';
+                
+                goodSites.forEach((site, index) => {
+                    const row = document.createElement('tr');
+                    
+                    const urlCell = document.createElement('td');
+                    const urlLink = document.createElement('a');
+                    urlLink.href = site;
+                    urlLink.textContent = site;
+                    urlLink.target = '_blank';
+                    urlCell.appendChild(urlLink);
+                    
+                    const actionsCell = document.createElement('td');
+                    const removeBtn = document.createElement('button');
+                    removeBtn.textContent = 'Remove';
+                    removeBtn.addEventListener('click', function() {
+                        // Remove from good sites array
+                        goodSites.splice(index, 1);
+                        updateGoodSitesTable();
+                        
+                        // Remove from combined sites array
+                        const combinedIndex = combinedSites.findIndex(item => item.url === site && item.type === 'good');
+                        if (combinedIndex !== -1) {
+                            combinedSites.splice(combinedIndex, 1);
+                            updateCombinedSitesTable();
+                        }
+                        
+                        // Update localStorage
+                        saveToLocalStorage();
+                    });
+                    actionsCell.appendChild(removeBtn);
+                    
+                    row.appendChild(urlCell);
+                    row.appendChild(actionsCell);
+                    goodSitesTable.appendChild(row);
+                });
+                
+                // Update localStorage
+                saveToLocalStorage();
+            }
+            
+            function updateIrrelevantSitesTable() {
+                irrelevantSitesTable.innerHTML = '';
+                
+                irrelevantSites.forEach((site, index) => {
+                    const row = document.createElement('tr');
+                    
+                    const urlCell = document.createElement('td');
+                    const urlLink = document.createElement('a');
+                    urlLink.href = site;
+                    urlLink.textContent = site;
+                    urlLink.target = '_blank';
+                    urlCell.appendChild(urlLink);
+                    
+                    const actionsCell = document.createElement('td');
+                    const removeBtn = document.createElement('button');
+                    removeBtn.textContent = 'Remove';
+                    removeBtn.addEventListener('click', function() {
+                        // Remove from irrelevant sites array
+                        irrelevantSites.splice(index, 1);
+                        updateIrrelevantSitesTable();
+                        
+                        // Remove from combined sites array
+                        const combinedIndex = combinedSites.findIndex(item => item.url === site && item.type === 'irrelevant');
+                        if (combinedIndex !== -1) {
+                            combinedSites.splice(combinedIndex, 1);
+                            updateCombinedSitesTable();
+                        }
+                        
+                        // Update localStorage
+                        saveToLocalStorage();
+                    });
+                    actionsCell.appendChild(removeBtn);
+                    
+                    row.appendChild(urlCell);
+                    row.appendChild(actionsCell);
+                    irrelevantSitesTable.appendChild(row);
+                });
+                
+                // Update localStorage
+                saveToLocalStorage();
+            }
+            
+            function updateCombinedSitesTable() {
+                combinedSitesTable.innerHTML = '';
+                
+                // Get current filter
+                const currentFilter = document.querySelector('.filter-btn.active').id;
+                
+                // Filter sites based on current filter
+                let filteredSites = [];
+                if (currentFilter === 'show-all') {
+                    filteredSites = combinedSites;
+                } else if (currentFilter === 'show-good') {
+                    filteredSites = combinedSites.filter(site => site.type === 'good');
+                } else if (currentFilter === 'show-irrelevant') {
+                    filteredSites = combinedSites.filter(site => site.type === 'irrelevant');
+                }
+                
+                // Create table rows
+                filteredSites.forEach((site, index) => {
+                    const row = document.createElement('tr');
+                    row.classList.add(site.type === 'good' ? 'good-site-row' : 'irrelevant-site-row');
+                    
+                    const urlCell = document.createElement('td');
+                    const urlLink = document.createElement('a');
+                    urlLink.href = site.url;
+                    urlLink.textContent = site.url;
+                    urlLink.target = '_blank';
+                    urlCell.appendChild(urlLink);
+                    
+                    const typeCell = document.createElement('td');
+                    typeCell.textContent = site.type === 'good' ? 'Good' : 'Irrelevant';
+                    typeCell.style.color = site.type === 'good' ? '#81C784' : '#EF9A9A';
+                    typeCell.style.fontWeight = 'bold';
+                    
+                    const actionsCell = document.createElement('td');
+                    const removeBtn = document.createElement('button');
+                    removeBtn.textContent = 'Remove';
+                    removeBtn.addEventListener('click', function() {
+                        // Remove from combined sites array
+                        combinedSites.splice(index, 1);
+                        
+                        // Also remove from respective array (good or irrelevant)
+                        if (site.type === 'good') {
+                            const goodIndex = goodSites.indexOf(site.url);
+                            if (goodIndex !== -1) {
+                                goodSites.splice(goodIndex, 1);
+                                updateGoodSitesTable();
+                            }
+                        } else {
+                            const irrelevantIndex = irrelevantSites.indexOf(site.url);
+                            if (irrelevantIndex !== -1) {
+                                irrelevantSites.splice(irrelevantIndex, 1);
+                                updateIrrelevantSitesTable();
+                            }
+                        }
+                        
+                        updateCombinedSitesTable();
+                        
+                        // Update localStorage
+                        saveToLocalStorage();
+                    });
+                    actionsCell.appendChild(removeBtn);
+                    
+                    row.appendChild(urlCell);
+                    row.appendChild(typeCell);
+                    row.appendChild(actionsCell);
+                    combinedSitesTable.appendChild(row);
+                });
+                
+                // Update localStorage
+                saveToLocalStorage();
+            }
+            
+            // London time function
+            function updateLondonTime() {
+                const options = { 
+                    timeZone: 'Europe/London',
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit',
+                    hour12: false
+                };
+                
+                const londonTime = new Date().toLocaleTimeString('en-GB', options);
+                timerElement.textContent = londonTime;
+            }
+            
+            // Update London time every second
+            function startLondonClock() {
+                // Update immediately
+                updateLondonTime();
+                
+                // Then update every second
+                clockInterval = setInterval(updateLondonTime, 1000);
+            }
+            
+            // Table action functions
+            function copyTableToClipboard(sites) {
+                const text = sites.join('\n');
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        showNotification('Table copied to clipboard');
+                    })
+                    .catch(err => {
+                        showNotification('Failed to copy: ' + err);
+                    });
+            }
+            
+            function clearTable(sitesArray, updateFunction) {
+                if (confirm('Are you sure you want to delete all items in this table?')) {
+                    sitesArray.length = 0; // Clear the array
+                    updateFunction();
+                    saveToLocalStorage(); // Save changes to localStorage
+                    showNotification('Table cleared');
+                }
+            }
+            
+            // Function to save data to localStorage
+            function saveToLocalStorage() {
+                localStorage.setItem('goodSites', JSON.stringify(goodSites));
+                localStorage.setItem('irrelevantSites', JSON.stringify(irrelevantSites));
+                localStorage.setItem('combinedSites', JSON.stringify(combinedSites));
+            }
+            
+            // Function to load data from localStorage
+            function loadFromLocalStorage() {
+                const savedGoodSites = localStorage.getItem('goodSites');
+                const savedIrrelevantSites = localStorage.getItem('irrelevantSites');
+                const savedCombinedSites = localStorage.getItem('combinedSites');
+                
+                if (savedGoodSites) {
+                    goodSites = JSON.parse(savedGoodSites);
+                    updateGoodSitesTable();
+                }
+                
+                if (savedIrrelevantSites) {
+                    irrelevantSites = JSON.parse(savedIrrelevantSites);
+                    updateIrrelevantSitesTable();
+                }
+                
+                if (savedCombinedSites) {
+                    combinedSites = JSON.parse(savedCombinedSites);
+                    updateCombinedSitesTable();
+                }
+            }
+            
+            // Start the London clock
+            startLondonClock();
+            
+            // Load saved data
+            loadFromLocalStorage();
+            
+            // Theme toggle functionality
+            const themeSwitch = document.getElementById('theme-switch');
+            
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                themeSwitch.checked = true;
+            }
+            
+            // Theme toggle event listener
+            themeSwitch.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.add('light-mode');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.body.classList.remove('light-mode');
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+            
+            // Table action button event listeners
+            copyGoodSitesBtn.addEventListener('click', function() {
+                copyTableToClipboard(goodSites);
+            });
+            
+            clearGoodSitesBtn.addEventListener('click', function() {
+                clearTable(goodSites, updateGoodSitesTable);
+                // Also remove good sites from combined sites
+                combinedSites = combinedSites.filter(site => site.type !== 'good');
+                updateCombinedSitesTable();
+            });
+            
+            copyIrrelevantSitesBtn.addEventListener('click', function() {
+                copyTableToClipboard(irrelevantSites);
+            });
+            
+            clearIrrelevantSitesBtn.addEventListener('click', function() {
+                clearTable(irrelevantSites, updateIrrelevantSitesTable);
+                // Also remove irrelevant sites from combined sites
+                combinedSites = combinedSites.filter(site => site.type !== 'irrelevant');
+                updateCombinedSitesTable();
+            });
+            
+            // Combined sites table actions
+            copyCombinedSitesBtn.addEventListener('click', function() {
+                // Get current filter
+                const currentFilter = document.querySelector('.filter-btn.active').id;
+                
+                // Filter sites based on current filter
+                let sitesToCopy = [];
+                if (currentFilter === 'show-all') {
+                    sitesToCopy = combinedSites.map(site => site.url);
+                } else if (currentFilter === 'show-good') {
+                    sitesToCopy = combinedSites.filter(site => site.type === 'good').map(site => site.url);
+                } else if (currentFilter === 'show-irrelevant') {
+                    sitesToCopy = combinedSites.filter(site => site.type === 'irrelevant').map(site => site.url);
+                }
+                
+                copyTableToClipboard(sitesToCopy);
+            });
+            
+            // Filter button event listeners
+            showAllBtn.addEventListener('click', function() {
+                setActiveFilter(this);
+                updateCombinedSitesTable();
+            });
+            
+            showGoodBtn.addEventListener('click', function() {
+                setActiveFilter(this);
+                updateCombinedSitesTable();
+            });
+            
+            showIrrelevantBtn.addEventListener('click', function() {
+                setActiveFilter(this);
+                updateCombinedSitesTable();
+            });
+            
+            function setActiveFilter(button) {
+                // Remove active class from all filter buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                button.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

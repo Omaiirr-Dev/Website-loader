@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Filter Tool</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --text-color: #f0f0f0;
+            --card-bg: #2d2d2d;
+            --border-color: #444;
+            --button-bg: #4CAF50;
+            --button-hover: #45a049;
+            --table-header-bg: #333;
+            --table-row-even: #3a3a3a;
+            --notification-bg: #333;
+            --removed-bg: rgba(255, 183, 77, 0.1);
+        }
+        
+        body.light-mode {
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --card-bg: white;
+            --border-color: #ddd;
+            --button-bg: #4CAF50;
+            --button-hover: #45a049;
+            --table-header-bg: #f2f2f2;
+            --table-row-even: #f9f9f9;
+            --notification-bg: #333;
+            --removed-bg: rgba(255, 183, 77, 0.1);
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        h1, h2 {
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+        
+        h1 + p {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 0.95em;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .results-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            justify-items: center;
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 100;
+            background-color: var(--card-bg);
+            padding: 8px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+        
+        .section {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+        }
+        
+        textarea {
+            width: 85%;
+            max-width: 450px;
+            height: 120px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            resize: vertical;
+            font-family: monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            margin: 0 auto;
+            display: block;
+        }
+        
+        button {
+            padding: 10px 18px;
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            width: 180px;
+            margin: 10px auto 0;
+            display: block;
+            font-weight: 500;
+        }
+        
+        button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+        }
+        
+        table {
+            width: 100%;
+            max-width: 450px;
+            border-collapse: collapse;
+            margin: 10px auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-size: 0.9em;
+            font-family: monospace;
+        }
+        
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 6px 8px;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 450px;
+        }
+        
+        th {
+            background-color: var(--table-header-bg);
+            color: var(--text-color);
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: var(--table-row-even);
+        }
+        
+        tr:hover {
+            background-color: rgba(150, 150, 150, 0.1);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--notification-bg);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 8px 15px;
+            background-color: var(--card-bg);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+        
+        .nav-links a:hover {
+            background-color: rgba(150, 150, 150, 0.1);
+        }
+        
+        .nav-links a.active {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        
+        /* Database Sites Section */
+        .database-sites {
+            padding: 12px;
+            border-radius: 5px;
+            background-color: rgba(33, 150, 243, 0.05);
+            border: 1px solid #2196F3;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .database-sites h3 {
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: #1565C0;
+            font-size: 1em;
+        }
+        
+        .database-sites table {
+            margin-bottom: 8px;
+            border: 1px solid rgba(33, 150, 243, 0.3);
+        }
+        
+        /* Detected Sites Section */
+        .detected-sites {
+            padding: 12px;
+            background-color: rgba(255, 183, 77, 0.05);
+            border: 1px solid #FFB74D;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(255, 183, 77, 0.15);
+            text-align: center;
+        }
+        
+        .detected-sites h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: #F57C00;
+            font-size: 1em;
+            font-weight: bold;
+        }
+        
+        .detected-sites table {
+            margin-bottom: 8px;
+            border: 1px solid rgba(255, 183, 77, 0.3);
+        }
+        
+        /* New Sites Section */
+        .new-sites {
+            padding: 12px;
+            border-radius: 5px;
+            background-color: rgba(76, 175, 80, 0.05);
+            border: 1px solid #4CAF50;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .new-sites h3 {
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: #2E7D32;
+            font-size: 1em;
+        }
+        
+        .new-sites table {
+            margin-bottom: 8px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="notification" class="notification"></div>
+    <div class="container">
+        <div class="theme-toggle">
+            <span style="color: var(--text-color);">Dark</span>
+            <label class="switch">
+                <input type="checkbox" id="theme-switch">
+                <span class="slider"></span>
+            </label>
+            <span style="color: var(--text-color);">Light</span>
+        </div>
+        
+        <h1>Website Filter Tool</h1>
+        <p>Check a list of sites against your database to identify which ones are already known and which ones are new.</p>
+        
+        <div class="nav-links">
+            <a href="index.html">Main Tool</a>
+            <a href="compare.html" class="active">Compare & Filter</a>
+        </div>
+        
+        <div class="input-container">
+            <div class="section" style="flex: 1;">
+                <h2>Database Sites</h2>
+                <div class="input-area">
+                    <p>Enter your database sites (one URL per line):</p>
+                    <textarea id="database-sites" placeholder="https://example.com
+https://another-example.com"></textarea>
+                </div>
+            </div>
+            
+            <div class="section" style="flex: 1;">
+                <h2>Sites to Check</h2>
+                <div class="input-area">
+                    <p>Enter sites to check against the database (one URL per line):</p>
+                    <div style="position: relative;">
+                        <textarea id="compare-sites" placeholder="google.com
+example.org"></textarea>
+                        <div id="filter-badge" style="position: absolute; top: 5px; right: 5px; background-color: #4CAF50; color: white; font-size: 0.7em; padding: 2px 6px; border-radius: 10px; opacity: 0.8;">Auto-Filter Active</div>
+                    </div>
+                    <p style="font-size: 0.85em; margin-top: 5px; color: var(--text-color); opacity: 0.7;">Non-URL content will be automatically filtered out</p>
+                    <button id="compare-button">Filter Sites</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Results</h2>
+            <div id="results-area">
+                <p>After filtering, you'll see three tables:</p>
+                <ul>
+                    <li><strong>Database Sites</strong> - All sites in your database</li>
+                    <li><strong>Detected Sites</strong> - URLs that were found in your database</li>
+                    <li><strong>New Sites</strong> - URLs that are not in your database</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const databaseSitesTextarea = document.getElementById('database-sites');
+            const compareSitesTextarea = document.getElementById('compare-sites');
+            const compareButton = document.getElementById('compare-button');
+            const resultsArea = document.getElementById('results-area');
+            
+            // Notification system
+            const notification = document.getElementById('notification');
+            let notificationTimeout;
+            
+            function showNotification(message, duration = 3000) {
+                // Clear any existing timeout
+                if (notificationTimeout) {
+                    clearTimeout(notificationTimeout);
+                }
+                
+                // Set message and show notification
+                notification.textContent = message;
+                notification.classList.add('show');
+                
+                // Hide after duration
+                notificationTimeout = setTimeout(function() {
+                    notification.classList.remove('show');
+                }, duration);
+            }
+            
+            // Theme toggle functionality
+            const themeSwitch = document.getElementById('theme-switch');
+            
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                themeSwitch.checked = true;
+            }
+            
+            // Theme toggle event listener
+            themeSwitch.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.add('light-mode');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.body.classList.remove('light-mode');
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+            
+            // Auto-load combined sites from localStorage if available
+            window.addEventListener('load', function() {
+                const combinedSites = JSON.parse(localStorage.getItem('combinedSites') || '[]');
+                if (combinedSites.length > 0) {
+                    const urls = combinedSites.map(site => site.url);
+                    databaseSitesTextarea.value = urls.join('\n');
+                }
+                
+                // Set up real-time filtering for the Sites to Check textarea
+                setupRealTimeFiltering();
+            });
+            
+            // Function to set up real-time filtering for the Sites to Check textarea
+            function setupRealTimeFiltering() {
+                let filterTimeout;
+                const filterBadge = document.getElementById('filter-badge');
+                
+                // Function to update filter badge visibility
+                function updateFilterBadge() {
+                    filterBadge.style.animation = 'pulse 1s';
+                    setTimeout(() => {
+                        filterBadge.style.animation = '';
+                    }, 1000);
+                }
+
+                // Add keyframe animation to head if not already present
+                if (!document.getElementById('filter-animations')) {
+                    const style = document.createElement('style');
+                    style.id = 'filter-animations';
+                    style.textContent = `
+                        @keyframes pulse {
+                            0% { transform: scale(1); }
+                            50% { transform: scale(1.1); }
+                            100% { transform: scale(1); }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                // Add event listeners for input events (typing, pasting, etc.)
+                compareSitesTextarea.addEventListener('input', function() {
+                    // Clear any existing timeout to prevent multiple rapid executions
+                    if (filterTimeout) clearTimeout(filterTimeout);
+                    
+                    // Set a small timeout to avoid filtering on every keystroke
+                    filterTimeout = setTimeout(function() {
+                        const currentText = compareSitesTextarea.value.trim();
+                        if (currentText) {
+                            // Extract valid URLs and update the textarea
+                            const validUrls = extractValidUrls(currentText);
+                            
+                            // Only update if there's a difference to avoid cursor jumping
+                            const newText = validUrls.join('\n');
+                            if (newText !== currentText) {
+                                // Count removed items
+                                const originalLines = currentText.split('\n').length;
+                                const filteredLines = validUrls.length;
+                                const removedCount = originalLines - filteredLines;
+                                
+                                // Save cursor position
+                                const cursorPos = compareSitesTextarea.selectionStart;
+                                compareSitesTextarea.value = newText;
+                                
+                                // Try to restore cursor to a reasonable position
+                                try {
+                                    compareSitesTextarea.setSelectionRange(
+                                        Math.min(cursorPos, newText.length),
+                                        Math.min(cursorPos, newText.length)
+                                    );
+                                } catch (e) {
+                                    // Ignore errors with cursor positioning
+                                }
+                                
+                                // Show a detailed notification and animate badge
+                                showNotification(`Filtered out ${removedCount} non-URL item${removedCount !== 1 ? 's' : ''}`, 1500);
+                                updateFilterBadge();
+                            }
+                        }
+                    }, 800); // Wait 800ms after typing stops before filtering
+                });
+                
+                // Add special handling for paste events to immediately filter
+                compareSitesTextarea.addEventListener('paste', function() {
+                    // Use a short timeout to allow the paste to complete first
+                    setTimeout(function() {
+                        const currentText = compareSitesTextarea.value.trim();
+                        if (currentText) {
+                            const originalLines = currentText.split('\n').length;
+                            const validUrls = extractValidUrls(currentText);
+                            const filteredLines = validUrls.length;
+                            const removedCount = originalLines - filteredLines;
+                            
+                            compareSitesTextarea.value = validUrls.join('\n');
+                            
+                            // Show more detailed notification
+                            if (removedCount > 0) {
+                                showNotification(`Filtered out ${removedCount} non-URL item${removedCount !== 1 ? 's' : ''} from pasted content`, 2000);
+                                updateFilterBadge();
+                            } else {
+                                showNotification(`Processed ${validUrls.length} valid URLs from paste`, 2000);
+                            }
+                        }
+                    }, 10);
+                });
+            }
+            
+            // Function to extract valid URLs from text input
+            function extractValidUrls(text) {
+                if (!text) return [];
+                
+                return text.split('\n')
+                    .map(line => {
+                        // Remove leading numbers, spaces, and other non-URL characters
+                        let cleaned = line.trim();
+                        
+                        // Skip empty lines or lines that are just numbers/symbols
+                        if (!cleaned || /^[\d\s\W]+$/.test(cleaned)) return '';
+                        
+                        // Handle common prefixes that might not be URLs
+                        if (cleaned.startsWith('- ') || cleaned.startsWith('* ')) {
+                            cleaned = cleaned.substring(2).trim();
+                        }
+                        
+                        // Remove leading numbers, bullets, and non-alphanumeric characters
+                        cleaned = cleaned.replace(/^[^a-zA-Z0-9.]+/, '');
+                        
+                        // Try to extract a URL or domain pattern
+                        // This regex looks for domain patterns with at least one dot
+                        const urlPattern = /(?:https?:\/\/)?([a-zA-Z0-9][-a-zA-Z0-9]*\.)+[a-zA-Z0-9][-a-zA-Z0-9]*/i;
+                        const match = cleaned.match(urlPattern);
+                        
+                        // If we found a match, return it, otherwise empty string
+                        return match ? match[0] : '';
+                    })
+                    .filter(url => {
+                        // Only keep strings that look like domains (contain at least one dot)
+                        return url !== '' && url.includes('.');
+                    });
+            }
+            
+            // Compare and filter functionality
+            compareButton.addEventListener('click', function() {
+                const databaseSites = databaseSitesTextarea.value.trim();
+                const compareSites = compareSitesTextarea.value.trim();
+                
+                if (!databaseSites || !compareSites) {
+                    showNotification('Please enter both database sites and sites to compare');
+                    return;
+                }
+                
+                // Get original values to check if filtering occurred
+                 const originalDatabaseText = databaseSites;
+                 const originalCompareText = compareSites;
+                 
+                 // Process and clean database sites
+                 const databaseUrls = extractValidUrls(databaseSites)
+                     .map(url => normalizeUrl(url));
+                 
+                 // Process and clean sites to check
+                 const compareUrls = extractValidUrls(compareSites)
+                     .map(url => normalizeUrl(url));
+                 
+                 // Check if filtering occurred by comparing line counts
+                 const databaseFiltered = databaseUrls.length !== originalDatabaseText.split('\n').filter(line => line.trim()).length;
+                 const compareFiltered = compareUrls.length !== originalCompareText.split('\n').filter(line => line.trim()).length;
+                
+                // Update the textarea with cleaned URLs
+                databaseSitesTextarea.value = databaseUrls.join('\n');
+                compareSitesTextarea.value = compareUrls.join('\n');
+                
+                // Show notifications if filtering occurred
+                if (databaseFiltered) {
+                    showNotification('Database sites filtered to valid URLs only');
+                }
+                
+                if (compareFiltered) {
+                    showNotification('Sites to check filtered to valid URLs only');
+                    // Animate the filter badge
+                    const filterBadge = document.getElementById('filter-badge');
+                    if (filterBadge) {
+                        filterBadge.style.animation = 'pulse 1s';
+                        setTimeout(() => {
+                            filterBadge.style.animation = '';
+                        }, 1000);
+                    }
+                }
+                
+                // Find matches and filter
+                const matches = [];
+                const filtered = [];
+                
+                for (const compareUrl of compareUrls) {
+                    let isMatch = false;
+                    
+                    for (const dbUrl of databaseUrls) {
+                        if (compareUrl === dbUrl) {
+                            matches.push(compareUrl);
+                            isMatch = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!isMatch) {
+                        filtered.push(compareUrl);
+                    }
+                }
+                
+                // Save to localStorage for future use
+                localStorage.setItem('databaseSites', databaseUrls.join('\n'));
+                
+                // Display results
+                displayResults(matches, filtered, compareUrls);
+            });
+            
+            // Helper function to normalize URLs for comparison
+            function normalizeUrl(url) {
+                // Remove protocol (http://, https://)
+                let normalized = url.replace(/^https?:\/\//i, '');
+                
+                // Remove www.
+                normalized = normalized.replace(/^www\./i, '');
+                
+                // Remove trailing slash if present
+                normalized = normalized.replace(/\/$/, '');
+                
+                return normalized.toLowerCase();
+            }
+            
+            // Display results in the results area
+            function displayResults(matches, filtered, originalUrls) {
+                resultsArea.innerHTML = '';
+                
+                // Create summary
+                const summary = document.createElement('div');
+                summary.style.marginBottom = '15px';
+                summary.innerHTML = `
+                    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                        <p style="margin: 0;"><strong>Total sites checked:</strong> ${originalUrls.length}</p>
+                        <p style="margin: 0;"><strong>Detected sites:</strong> ${matches.length}</p>
+                        <p style="margin: 0;"><strong>New sites:</strong> ${filtered.length}</p>
+                    </div>
+                `;
+                resultsArea.appendChild(summary);
+                
+                // Create results container
+                const resultsContainer = document.createElement('div');
+                resultsContainer.className = 'results-container';
+                resultsArea.appendChild(summary);
+                resultsArea.appendChild(resultsContainer);
+                
+                // Display database sites table
+                const databaseSection = document.createElement('div');
+                databaseSection.className = 'database-sites';
+                databaseSection.innerHTML = `<h3>Database Sites</h3>`;
+                
+                // Create table for database sites
+                const databaseTable = document.createElement('table');
+                const databaseUrls = extractValidUrls(databaseSitesTextarea.value.trim());
+                
+                databaseTable.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>URL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${databaseUrls.map(url => `<tr><td>${url}</td></tr>`).join('')}
+                    </tbody>
+                `;
+                
+                const copyDatabaseBtn = document.createElement('button');
+                copyDatabaseBtn.textContent = 'Copy Database Sites';
+                copyDatabaseBtn.style.width = '140px';
+                copyDatabaseBtn.style.fontSize = '0.85em';
+                copyDatabaseBtn.style.padding = '6px 10px';
+                copyDatabaseBtn.style.margin = '5px auto';
+                copyDatabaseBtn.addEventListener('click', function() {
+                    navigator.clipboard.writeText(databaseUrls.join('\n'))
+                        .then(() => showNotification('Database sites copied to clipboard'))
+                        .catch(err => showNotification('Failed to copy: ' + err));
+                });
+                
+                databaseSection.appendChild(databaseTable);
+                databaseSection.appendChild(copyDatabaseBtn);
+                
+                resultsContainer.appendChild(databaseSection);
+                
+                // Display new sites table (sites not in database)
+                if (filtered.length > 0) {
+                    const newSection = document.createElement('div');
+                    newSection.className = 'new-sites';
+                    newSection.innerHTML = `<h3>New Sites (Not in Database)</h3>`;
+                    
+                    // Create table for new sites
+                    const newTable = document.createElement('table');
+                    newTable.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filtered.map(url => `<tr><td>${url}</td></tr>`).join('')}
+                        </tbody>
+                    `;
+                    
+                    const copyNewBtn = document.createElement('button');
+                    copyNewBtn.textContent = 'Copy New Sites';
+                    copyNewBtn.style.width = '140px';
+                    copyNewBtn.style.fontSize = '0.85em';
+                    copyNewBtn.style.padding = '6px 10px';
+                    copyNewBtn.style.margin = '5px auto';
+                    copyNewBtn.addEventListener('click', function() {
+                        navigator.clipboard.writeText(filtered.join('\n'))
+                            .then(() => showNotification('New sites copied to clipboard'))
+                            .catch(err => showNotification('Failed to copy: ' + err));
+                    });
+                    
+                    newSection.appendChild(newTable);
+                    newSection.appendChild(copyNewBtn);
+                    
+                    resultsContainer.appendChild(newSection);
+                } else {
+                    // Display empty new sites section
+                    const newSection = document.createElement('div');
+                    newSection.className = 'new-sites';
+                    newSection.innerHTML = `
+                        <h3>New Sites (Not in Database)</h3>
+                        <p>No new sites found.</p>
+                    `;
+                    resultsContainer.appendChild(newSection);
+                }
+                
+                // Display detected sites table (sites found in database)
+                if (matches.length > 0) {
+                    const detectedSection = document.createElement('div');
+                    detectedSection.className = 'detected-sites';
+                    detectedSection.innerHTML = `<h3>Detected Sites (Found in Database)</h3>`;
+                    
+                    // Create table for detected sites
+                    const detectedTable = document.createElement('table');
+                    detectedTable.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${matches.map(url => `<tr><td>${url}</td></tr>`).join('')}
+                        </tbody>
+                    `;
+                    
+                    const copyDetectedBtn = document.createElement('button');
+                    copyDetectedBtn.textContent = 'Copy Detected Sites';
+                    copyDetectedBtn.style.width = '140px';
+                    copyDetectedBtn.style.fontSize = '0.85em';
+                    copyDetectedBtn.style.padding = '6px 10px';
+                    copyDetectedBtn.style.margin = '5px auto';
+                    copyDetectedBtn.addEventListener('click', function() {
+                        navigator.clipboard.writeText(matches.join('\n'))
+                            .then(() => showNotification('Detected sites copied to clipboard'))
+                            .catch(err => showNotification('Failed to copy: ' + err));
+                    });
+                    
+                    detectedSection.appendChild(detectedTable);
+                    detectedSection.appendChild(copyDetectedBtn);
+                    
+                    resultsContainer.appendChild(detectedSection);
+                } else {
+                    // Display empty detected sites section
+                    const detectedSection = document.createElement('div');
+                    detectedSection.className = 'detected-sites';
+                    detectedSection.innerHTML = `
+                        <h3>Detected Sites (Found in Database)</h3>
+                        <p>No sites were detected in the database.</p>
+                    `;
+                    resultsContainer.appendChild(detectedSection);
+                }
+                
+                showNotification(`Filtering complete: ${filtered.length} new sites, ${matches.length} detected sites`);
+            }
+        });
+    </script>
+</body>
+</html>
