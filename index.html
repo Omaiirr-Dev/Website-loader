@@ -1009,8 +1009,8 @@ https://another-example.com"></textarea>
                 }
                 
                 // Save current site textarea content
-                if (sitesTextarea.value) {
-                    localStorage.setItem('sitesTextareaContent', sitesTextarea.value);
+                if (websiteInput.value) {
+                    localStorage.setItem('sitesTextareaContent', websiteInput.value);
                 }
             }
             
@@ -1054,7 +1054,7 @@ https://another-example.com"></textarea>
                 
                 // Load sites textarea content
                 if (savedSitesTextareaContent) {
-                    sitesTextarea.value = savedSitesTextareaContent;
+                    websiteInput.value = savedSitesTextareaContent;
                 }
             }
             
@@ -1066,8 +1066,9 @@ https://another-example.com"></textarea>
             
             // Reset button functionality
             document.getElementById('reset-button').addEventListener('click', function() {
-                // Save theme preference before clearing localStorage
+                // Save theme preference and website input content before clearing localStorage
                 const currentTheme = localStorage.getItem('theme');
+                const websiteInputContent = websiteInput.value;
                 
                 // Clear localStorage except theme
                 localStorage.removeItem('goodSites');
@@ -1075,11 +1076,13 @@ https://another-example.com"></textarea>
                 localStorage.removeItem('combinedSites');
                 localStorage.removeItem('websites');
                 localStorage.removeItem('currentIndex');
-                localStorage.removeItem('sitesTextareaContent');
                 
-                // Restore theme preference
+                // Restore theme preference and website input content
                 if (currentTheme) {
                     localStorage.setItem('theme', currentTheme);
+                }
+                if (websiteInputContent) {
+                    localStorage.setItem('sitesTextareaContent', websiteInputContent);
                 }
                 
                 // Reset data arrays
@@ -1089,8 +1092,8 @@ https://another-example.com"></textarea>
                 websites = [];
                 currentIndex = -1;
                 
-                // Clear UI
-                sitesTextarea.value = '';
+                // Keep the website input content
+                // Don't clear websiteInput.value
                 
                 // Update tables
                 updateGoodSitesTable();
@@ -1098,7 +1101,7 @@ https://another-example.com"></textarea>
                 updateCombinedSitesTable();
                 updateCurrentSiteDisplay();
                 
-                showNotification('All data has been reset');
+                showNotification('Tables and processed data have been reset');
             });
             
             // Theme toggle functionality

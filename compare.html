@@ -469,19 +469,28 @@ example.org"></textarea>
             // Reset button functionality
             const resetButton = document.getElementById('reset-button');
             resetButton.addEventListener('click', function() {
-                // Clear localStorage data except theme preference
+                // Save theme preference and textarea content before clearing localStorage
                 const theme = localStorage.getItem('theme');
-                localStorage.removeItem('databaseSites');
-                localStorage.removeItem('compareSites');
+                const databaseSitesContent = databaseSitesTextarea.value;
+                const compareSitesContent = compareSitesTextarea.value;
+                
+                // Clear localStorage data except theme preference
                 localStorage.removeItem('compareResults');
                 localStorage.removeItem('combinedSites'); // Also clear legacy data
+                
+                // Restore theme preference and textarea content
                 if (theme) {
                     localStorage.setItem('theme', theme); // Preserve theme setting
                 }
+                if (databaseSitesContent) {
+                    localStorage.setItem('databaseSites', databaseSitesContent);
+                }
+                if (compareSitesContent) {
+                    localStorage.setItem('compareSites', compareSitesContent);
+                }
                 
-                // Clear textareas
-                databaseSitesTextarea.value = '';
-                compareSitesTextarea.value = '';
+                // Keep the textarea content
+                // Don't clear databaseSitesTextarea.value and compareSitesTextarea.value
                 
                 // Clear results
                 resultsArea.innerHTML = `
@@ -493,7 +502,7 @@ example.org"></textarea>
                     </ul>
                 `;
                 
-                showNotification('All data has been reset', 3000);
+                showNotification('Results have been reset', 3000);
             });
             
             // Auto-load saved data from localStorage if available
