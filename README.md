@@ -1,4 +1,4 @@
-# Website Shooter
+# Website Loader
 
 A simple web application that helps you quickly categorize websites from a list as either "Good" or "Irrelevant" using keyboard shortcuts. Features a sleek dark mode interface with light mode option. Includes a comparison tool to filter lists of websites against your database.
 

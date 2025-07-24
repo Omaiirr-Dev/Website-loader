@@ -16,6 +16,14 @@
             --table-row-even: #3a3a3a;
             --notification-bg: #333;
             --removed-bg: rgba(255, 183, 77, 0.1);
+            --accent-color: #2196F3;
+            --accent-hover: #1976D2;
+            --warning-color: #f44336;
+            --warning-hover: #d32f2f;
+            --success-color: #4CAF50;
+            --success-hover: #45a049;
+            --info-color: #2196F3;
+            --info-hover: #1976D2;
         }
         
         body.light-mode {
@@ -189,22 +197,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.12);
         }
         
-        .nav-reset-button {
-            background-color: #f44336;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 15px;
-            cursor: pointer;
-            font-size: 0.85em;
-            transition: background-color 0.3s ease;
-            margin-left: auto;
-            display: inline-block;
-        }
-        
-        .nav-reset-button:hover {
-            background-color: #d32f2f;
-        }
+
         
         table {
             width: 100%;
@@ -281,32 +274,9 @@
         }
         
         .nav-links a.active {
-            background-color: #4CAF50;
+            background-color: var(--button-bg);
             color: white;
-            border-color: #4CAF50;
-        }
-        
-        /* Database Sites Section */
-        .database-sites {
-            padding: 12px;
-            border-radius: 5px;
-            background-color: rgba(33, 150, 243, 0.05);
-            border: 1px solid #2196F3;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        
-        .database-sites h3 {
-            font-weight: bold;
-            margin-top: 0;
-            margin-bottom: 5px;
-            color: #1565C0;
-            font-size: 1em;
-        }
-        
-        .database-sites table {
-            margin-bottom: 8px;
-            border: 1px solid rgba(33, 150, 243, 0.3);
+            border-color: var(--button-bg);
         }
         
         /* Detected Sites Section */
@@ -354,6 +324,122 @@
             margin-bottom: 8px;
             border: 1px solid rgba(76, 175, 80, 0.3);
         }
+        
+        /* Filter tools */
+        .filter-tools {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 10px auto;
+            max-width: 450px;
+        }
+        
+        .filter-row {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .filter-input {
+            flex: 1;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        
+        .filter-button {
+            width: auto;
+            margin: 0;
+            padding: 8px 12px;
+            font-size: 0.9em;
+        }
+        
+        .filter-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 10px;
+            opacity: 0.8;
+        }
+        
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 5px 0;
+            justify-content: center;
+        }
+        
+        .filter-chip {
+             background-color: var(--accent-color);
+             color: white;
+             padding: 4px 10px;
+             border-radius: 15px;
+             font-size: 0.8em;
+             display: inline-flex;
+             align-items: center;
+             gap: 5px;
+             cursor: pointer;
+             transition: all 0.2s;
+             position: relative;
+         }
+         
+         .filter-chip:hover {
+             background-color: var(--accent-hover);
+         }
+         
+         /* All filter chips now have × buttons */
+         .filter-chip::after {
+             content: '×';
+             font-size: 1.2em;
+             font-weight: bold;
+             margin-left: 3px;
+             transition: all 0.2s;
+             color: rgba(255, 255, 255, 0.9);
+         }
+         
+         .filter-chip:hover::after {
+             transform: scale(1.2);
+             color: white;
+         }
+         
+         /* Default chips have different styling */
+         .filter-chip.default {
+             background-color: var(--info-color);
+         }
+         
+         .filter-chip.default:hover {
+             background-color: var(--info-hover);
+         }
+         
+         /* Custom chips keep their original styling */
+         .filter-chip.custom {
+             background-color: var(--accent-color);
+         }
+         
+         .filter-chip.custom:hover {
+             background-color: var(--accent-hover);
+         }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .search-bar-container {
+            margin: 10px 0;
+            display: flex;
+            gap: 10px;
+            max-width: 450px;
+            margin: 10px auto;
+        }
     </style>
 </head>
 <body>
@@ -366,9 +452,8 @@
                 <span class="slider"></span>
             </label>
             <span style="color: var(--text-color);">Light</span>
+            <button id="reset-button" style="background-color: var(--warning-color); color: white; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer; font-size: 0.85em; margin-left: 15px; margin-top: -2px;">Reset All Data</button>
         </div>
-        
-
         
         <h1>Website Filter Tool</h1>
         <p>Check a list of sites against your database to identify which ones are already known and which ones are new.</p>
@@ -376,7 +461,6 @@
         <div class="nav-links">
             <a href="index.html">Main Tool</a>
             <a href="compare.html" class="active">Compare & Filter</a>
-            <button id="reset-button" class="nav-reset-button">Reset All Data</button>
         </div>
         
         <div class="input-container">
@@ -396,20 +480,42 @@ https://another-example.com"></textarea>
                     <div style="position: relative;">
                         <textarea id="compare-sites" placeholder="google.com
 example.org"></textarea>
-                        <div id="filter-badge" style="position: absolute; top: 5px; right: 5px; background-color: #4CAF50; color: white; font-size: 0.7em; padding: 2px 6px; border-radius: 10px; opacity: 0.8;">Auto-Filter Active</div>
+                        <div id="filter-badge" class="filter-badge">Auto-Filter Active</div>
                     </div>
                     <p style="font-size: 0.85em; margin-top: 5px; color: var(--text-color); opacity: 0.7;">Non-URL content will be automatically filtered out</p>
+                    
+                    <!-- Enhanced filter tools section -->
+                    <div class="filter-tools">
+                        <div class="filter-options">
+                            <div class="filter-chip default" data-word="icon" title="Click to apply filter, click × to hide">icon</div>
+                            <div class="filter-chip default" data-word="website" title="Click to apply filter, click × to hide">website</div>
+                        </div>
+                        
+                        <div class="filter-row">
+                            <input type="text" id="word-to-remove" class="filter-input" placeholder="Enter word to remove">
+                            <button id="remove-word-button" class="filter-button">Remove Word</button>
+                        </div>
+                        
+                        <div class="filter-row">
+                            <input type="text" id="custom-filter" class="filter-input" placeholder="Add custom filter">
+                            <button id="add-filter-button" class="filter-button" style="background-color: var(--info-color);">Add Filter</button>
+                        </div>
+                        
+                        <div class="filter-row">
+                            <button id="restore-defaults-button" class="filter-button" style="background-color: var(--warning-color); width: 100%;">Restore Hidden Filters</button>
+                        </div>
+                    </div>
+                    
                     <button id="compare-button">Filter Sites</button>
                 </div>
             </div>
         </div>
         
-        <div class="section">
+        <div class="section" style="max-width: 600px; margin: 0 auto;">
             <h2>Results</h2>
             <div id="results-area">
-                <p>After filtering, you'll see three tables:</p>
+                <p>After filtering, you'll see two tables:</p>
                 <ul>
-                    <li><strong>Database Sites</strong> - All sites in your database</li>
                     <li><strong>Detected Sites</strong> - URLs that were found in your database</li>
                     <li><strong>New Sites</strong> - URLs that are not in your database</li>
                 </ul>
@@ -424,6 +530,12 @@ example.org"></textarea>
             const compareSitesTextarea = document.getElementById('compare-sites');
             const compareButton = document.getElementById('compare-button');
             const resultsArea = document.getElementById('results-area');
+            const wordToRemoveInput = document.getElementById('word-to-remove');
+            const removeWordButton = document.getElementById('remove-word-button');
+            const customFilterInput = document.getElementById('custom-filter');
+            const addFilterButton = document.getElementById('add-filter-button');
+            const restoreDefaultsButton = document.getElementById('restore-defaults-button');
+            const filterChips = document.querySelectorAll('.filter-chip');
             
             // Notification system
             const notification = document.getElementById('notification');
@@ -466,37 +578,224 @@ example.org"></textarea>
                 }
             });
             
+            // Load custom filters from localStorage
+            function loadCustomFilters() {
+                const customFilters = JSON.parse(localStorage.getItem('customFilters') || '[]');
+                const filterOptions = document.querySelector('.filter-options');
+                
+                // Clear existing custom filters (keep default ones)
+                const existingCustomFilters = document.querySelectorAll('.filter-chip.custom');
+                existingCustomFilters.forEach(chip => chip.remove());
+                
+                // Add custom filters
+                customFilters.forEach(filter => {
+                    const chip = document.createElement('div');
+                    chip.className = 'filter-chip custom';
+                    chip.setAttribute('data-word', filter);
+                    chip.setAttribute('title', 'Click to apply filter, click × to remove');
+                    chip.textContent = filter;
+                    
+                    // Add event listener using the handler function
+                    addChipClickHandler(chip);
+                    
+                    filterOptions.appendChild(chip);
+                });
+            }
+            
+            // Save custom filters to localStorage
+            function saveCustomFilters() {
+                const customChips = document.querySelectorAll('.filter-chip.custom');
+                const filters = Array.from(customChips).map(chip => chip.getAttribute('data-word'));
+                localStorage.setItem('customFilters', JSON.stringify(filters));
+            }
+            
+            // Save hidden default chips to localStorage
+            function saveHiddenDefaultChips() {
+                const allDefaultChips = document.querySelectorAll('.filter-chip.default');
+                const hiddenChips = Array.from(allDefaultChips)
+                    .filter(chip => chip.style.display === 'none')
+                    .map(chip => chip.getAttribute('data-word'));
+                localStorage.setItem('hiddenDefaultChips', JSON.stringify(hiddenChips));
+            }
+            
+            // Load hidden default chips from localStorage
+            function loadHiddenDefaultChips() {
+                const hiddenChips = JSON.parse(localStorage.getItem('hiddenDefaultChips') || '[]');
+                hiddenChips.forEach(word => {
+                    const chip = document.querySelector(`.filter-chip.default[data-word="${word}"]`);
+                    if (chip) {
+                        chip.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Function to restore all hidden default chips
+            function restoreDefaultChips() {
+                const defaultChips = document.querySelectorAll('.filter-chip.default');
+                defaultChips.forEach(chip => {
+                    chip.style.display = 'inline-flex';
+                });
+                localStorage.removeItem('hiddenDefaultChips');
+                showNotification('All default filters restored');
+            }
+            
+            // Add custom filter
+            addFilterButton.addEventListener('click', function() {
+                const filterWord = customFilterInput.value.trim();
+                if (!filterWord) {
+                    showNotification('Please enter a word to add as filter');
+                    return;
+                }
+                
+                // Check if filter already exists
+                const existingFilter = document.querySelector(`.filter-chip[data-word="${filterWord}"]`);
+                if (existingFilter) {
+                    showNotification('This filter already exists');
+                    customFilterInput.value = '';
+                    return;
+                }
+                
+                // Create new filter chip
+                const filterOptions = document.querySelector('.filter-options');
+                const chip = document.createElement('div');
+                chip.className = 'filter-chip custom';
+                chip.setAttribute('data-word', filterWord);
+                chip.setAttribute('title', 'Click to apply filter, click × to remove');
+                chip.textContent = filterWord;
+                
+                // Add event listener using the handler function
+                addChipClickHandler(chip);
+                
+                filterOptions.appendChild(chip);
+                
+                // Save to localStorage
+                saveCustomFilters();
+                
+                // Clear input
+                customFilterInput.value = '';
+                
+                showNotification(`Added "${filterWord}" to filters`);
+            });
+            
+            // Restore defaults button event listener
+            restoreDefaultsButton.addEventListener('click', function() {
+                restoreDefaultChips();
+            });
+            
+            // Apply filter when clicking on a filter chip
+            filterChips.forEach(chip => {
+                // Use the addChipClickHandler function for consistency
+                addChipClickHandler(chip);
+            });
+            
+            // Function to add click handler to a chip
+            function addChipClickHandler(chip) {
+                chip.addEventListener('click', function(e) {
+                    const word = this.getAttribute('data-word');
+                    const rect = this.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    
+                    // If click is in the right 30% of the chip (on the ×), remove it
+                    if (clickX > rect.width * 0.7) {
+                        if (this.classList.contains('custom')) {
+                            // Remove custom chip from DOM
+                            this.remove();
+                            // Save updated filters
+                            saveCustomFilters();
+                            showNotification(`Removed "${word}" filter`);
+                        } else if (this.classList.contains('default')) {
+                            // Hide default chip and save its state
+                            this.style.display = 'none';
+                            saveHiddenDefaultChips();
+                            showNotification(`Hidden "${word}" filter`);
+                        }
+                        return;
+                    }
+                    
+                    // Otherwise apply the filter
+                    applyFilter(word);
+                });
+            }
+            
+            // Function to apply a filter
+            function applyFilter(word) {
+                if (!compareSitesTextarea.value.trim()) {
+                    showNotification('No sites to filter');
+                    return;
+                }
+                
+                const lines = compareSitesTextarea.value.split('\n');
+                let processedLines;
+                
+                // Check if this is a default filter (icon or website)
+                const isDefaultFilter = word === 'icon' || word === 'website';
+                
+                if (isDefaultFilter) {
+                    // For default filters, only remove the word but keep the line
+                    processedLines = lines.map(line => {
+                        return line.replace(new RegExp(word, 'gi'), '');
+                    });
+                    showNotification(`Removed "${word}" from all lines`);
+                } else {
+                    // For custom filters, remove entire lines that contain the word
+                    processedLines = lines.filter(line => {
+                        return !new RegExp(word, 'gi').test(line);
+                    });
+                    const removedCount = lines.length - processedLines.length;
+                    showNotification(`Deleted ${removedCount} line(s) containing "${word}"`);
+                }
+                
+                // Update textarea with processed content
+                compareSitesTextarea.value = processedLines.join('\n');
+                
+                // Save to localStorage
+                localStorage.setItem('compareSites', compareSitesTextarea.value);
+                
+                // Animate filter badge
+                const filterBadge = document.getElementById('filter-badge');
+                filterBadge.style.animation = 'pulse 1s';
+                setTimeout(() => {
+                    filterBadge.style.animation = '';
+                }, 1000);
+            }
+            
             // Reset button functionality
             const resetButton = document.getElementById('reset-button');
             resetButton.addEventListener('click', function() {
-                // Save theme preference and textarea content before clearing localStorage
+                // Save theme preference before clearing localStorage
                 const theme = localStorage.getItem('theme');
-                const databaseSitesContent = databaseSitesTextarea.value;
-                const compareSitesContent = compareSitesTextarea.value;
                 
                 // Clear localStorage data except theme preference
                 localStorage.removeItem('compareResults');
                 localStorage.removeItem('combinedSites'); // Also clear legacy data
+                localStorage.removeItem('customFilters'); // Remove custom filters
+                localStorage.removeItem('databaseSites');
+                localStorage.removeItem('compareSites');
                 
-                // Restore theme preference and textarea content
+                // Restore theme preference only
                 if (theme) {
                     localStorage.setItem('theme', theme); // Preserve theme setting
                 }
-                if (databaseSitesContent) {
-                    localStorage.setItem('databaseSites', databaseSitesContent);
-                }
-                if (compareSitesContent) {
-                    localStorage.setItem('compareSites', compareSitesContent);
-                }
                 
-                // Keep the textarea content
-                // Don't clear databaseSitesTextarea.value and compareSitesTextarea.value
+                // Clear text areas
+                databaseSitesTextarea.value = '';
+                compareSitesTextarea.value = '';
                 
-                // Clear results
+                // Remove all custom filter chips
+                const customChips = document.querySelectorAll('.filter-chip.custom');
+                customChips.forEach(chip => chip.remove());
+                
+                // Restore all hidden default chips
+                restoreDefaultChips();
+                
+                // Clear input fields
+                wordToRemoveInput.value = '';
+                customFilterInput.value = '';
+                
+                // Reset the results area to its default state
                 resultsArea.innerHTML = `
-                    <p>After filtering, you'll see three tables:</p>
+                    <p>After filtering, you'll see two tables:</p>
                     <ul>
-                        <li><strong>Database Sites</strong> - All sites in your database</li>
                         <li><strong>Detected Sites</strong> - URLs that were found in your database</li>
                         <li><strong>New Sites</strong> - URLs that are not in your database</li>
                     </ul>
@@ -505,8 +804,55 @@ example.org"></textarea>
                 showNotification('Results have been reset', 3000);
             });
             
+            // Add event listener for the remove word button
+            removeWordButton.addEventListener('click', function() {
+                const wordToRemove = wordToRemoveInput.value.trim();
+                if (!wordToRemove) {
+                    showNotification('Please enter a word to remove');
+                    return;
+                }
+                
+                // Get current content
+                const currentContent = compareSitesTextarea.value;
+                const lines = currentContent.split('\n');
+                let processedLines;
+                
+                // Check if this is a default filter (icon or website)
+                const isDefaultFilter = wordToRemove === 'icon' || wordToRemove === 'website';
+                
+                if (isDefaultFilter) {
+                    // For default filters, only remove the word but keep the line
+                    processedLines = lines.map(line => {
+                        return line.replace(new RegExp(wordToRemove, 'gi'), '');
+                    });
+                    showNotification(`Removed "${wordToRemove}" from all lines`);
+                } else {
+                    // For custom filters, remove entire lines that contain the word
+                    processedLines = lines.filter(line => {
+                        return !new RegExp(wordToRemove, 'gi').test(line);
+                    });
+                    const removedCount = lines.length - processedLines.length;
+                    showNotification(`Deleted ${removedCount} line(s) containing "${wordToRemove}"`);
+                }
+                
+                // Update textarea with processed content
+                compareSitesTextarea.value = processedLines.join('\n');
+                
+                // Save to localStorage
+                localStorage.setItem('compareSites', compareSitesTextarea.value);
+                
+                // Clear the input field
+                wordToRemoveInput.value = '';
+            });
+            
             // Auto-load saved data from localStorage if available
             window.addEventListener('load', function() {
+                // Load custom filters
+                loadCustomFilters();
+                
+                // Load hidden default chips
+                loadHiddenDefaultChips();
+                
                 // Load database sites
                 const savedDatabaseSites = localStorage.getItem('databaseSites');
                 if (savedDatabaseSites) {
@@ -554,14 +900,7 @@ example.org"></textarea>
                     button.parentNode.replaceChild(newButton, button);
                     
                     // Add new listener based on button text
-                    if (newButton.textContent === 'Copy Database Sites') {
-                        newButton.addEventListener('click', function() {
-                            const databaseUrls = extractValidUrls(databaseSitesTextarea.value.trim());
-                            navigator.clipboard.writeText(databaseUrls.join('\n'))
-                                .then(() => showNotification('Database sites copied to clipboard'))
-                                .catch(err => showNotification('Failed to copy: ' + err));
-                        });
-                    } else if (newButton.textContent === 'Copy New Sites') {
+                    if (newButton.textContent === 'Copy New Sites') {
                         newButton.addEventListener('click', function() {
                             // Extract URLs from the table
                             const newSitesTable = resultsArea.querySelector('.new-sites table');
@@ -601,31 +940,17 @@ example.org"></textarea>
                         filterBadge.style.animation = '';
                     }, 1000);
                 }
-
-                // Add keyframe animation to head if not already present
-                if (!document.getElementById('filter-animations')) {
-                    const style = document.createElement('style');
-                    style.id = 'filter-animations';
-                    style.textContent = `
-                        @keyframes pulse {
-                            0% { transform: scale(1); }
-                            50% { transform: scale(1.1); }
-                            100% { transform: scale(1); }
-                        }
-                    `;
-                    document.head.appendChild(style);
-                }
                 
                 // Add event listeners for input events (typing, pasting, etc.)
-            compareSitesTextarea.addEventListener('input', function() {
-                // Clear any existing timeout to prevent multiple rapid executions
-                if (filterTimeout) clearTimeout(filterTimeout);
-                
-                // Save the current content to localStorage
-                localStorage.setItem('compareSites', compareSitesTextarea.value);
-                
-                // Set a small timeout to avoid filtering on every keystroke
-                filterTimeout = setTimeout(function() {
+                compareSitesTextarea.addEventListener('input', function() {
+                    // Clear any existing timeout to prevent multiple rapid executions
+                    if (filterTimeout) clearTimeout(filterTimeout);
+                    
+                    // Save the current content to localStorage
+                    localStorage.setItem('compareSites', compareSitesTextarea.value);
+                    
+                    // Set a small timeout to avoid filtering on every keystroke
+                    filterTimeout = setTimeout(function() {
                         const currentText = compareSitesTextarea.value.trim();
                         if (currentText) {
                             // Extract valid URLs and update the textarea
@@ -692,19 +1017,38 @@ example.org"></textarea>
                 
                 return text.split('\n')
                     .map(line => {
-                        // Remove leading numbers, spaces, and other non-URL characters
-                        let cleaned = line.trim();
+                        // Remove spaces from the entire line
+                        let cleaned = line.trim().replace(/\s+/g, '');
                         
                         // Skip empty lines or lines that are just numbers/symbols
                         if (!cleaned || /^[\d\s\W]+$/.test(cleaned)) return '';
                         
                         // Handle common prefixes that might not be URLs
-                        if (cleaned.startsWith('- ') || cleaned.startsWith('* ')) {
-                            cleaned = cleaned.substring(2).trim();
+                        if (cleaned.startsWith('-') || cleaned.startsWith('*')) {
+                            cleaned = cleaned.substring(1).trim();
                         }
                         
                         // Remove leading numbers, bullets, and non-alphanumeric characters
                         cleaned = cleaned.replace(/^[^a-zA-Z0-9.]+/, '');
+                        
+                        // Remove 'icon' string from each line
+                        cleaned = cleaned.replace(/icon/gi, '');
+                        
+                        // Remove 'website' string from each line
+                        cleaned = cleaned.replace(/website/gi, '');
+                        
+                        // Remove 'www.' from each line
+                        cleaned = cleaned.replace(/www\./gi, '');
+                        
+                        // Additional check for domains that might still have 'icon' or 'website' in them
+                        if (cleaned.includes('.')) {
+                            const parts = cleaned.split('.');
+                            if (parts.length >= 2) {
+                                // Only modify the domain part (before the first dot)
+                                parts[0] = parts[0].replace(/icon/gi, '').replace(/website/gi, '');
+                                cleaned = parts.join('.');
+                            }
+                        }
                         
                         // Try to extract a URL or domain pattern
                         // This regex looks for domain patterns with at least one dot
@@ -731,20 +1075,20 @@ example.org"></textarea>
                 }
                 
                 // Get original values to check if filtering occurred
-                 const originalDatabaseText = databaseSites;
-                 const originalCompareText = compareSites;
-                 
-                 // Process and clean database sites
-                 const databaseUrls = extractValidUrls(databaseSites)
-                     .map(url => normalizeUrl(url));
-                 
-                 // Process and clean sites to check
-                 const compareUrls = extractValidUrls(compareSites)
-                     .map(url => normalizeUrl(url));
-                 
-                 // Check if filtering occurred by comparing line counts
-                 const databaseFiltered = databaseUrls.length !== originalDatabaseText.split('\n').filter(line => line.trim()).length;
-                 const compareFiltered = compareUrls.length !== originalCompareText.split('\n').filter(line => line.trim()).length;
+                const originalDatabaseText = databaseSites;
+                const originalCompareText = compareSites;
+                
+                // Process and clean database sites
+                const databaseUrls = extractValidUrls(databaseSites)
+                    .map(url => normalizeUrl(url));
+                
+                // Process and clean sites to check
+                const compareUrls = extractValidUrls(compareSites)
+                    .map(url => normalizeUrl(url));
+                
+                // Check if filtering occurred by comparing line counts
+                const databaseFiltered = databaseUrls.length !== originalDatabaseText.split('\n').filter(line => line.trim()).length;
+                const compareFiltered = compareUrls.length !== originalCompareText.split('\n').filter(line => line.trim()).length;
                 
                 // Update the textarea with cleaned URLs
                 databaseSitesTextarea.value = databaseUrls.join('\n');
@@ -801,7 +1145,7 @@ example.org"></textarea>
                 let normalized = url.replace(/^https?:\/\//i, '');
                 
                 // Remove www.
-                normalized = normalized.replace(/^www\./i, '');
+                normalized = normalized.replace(/www\./gi, '');
                 
                 // Remove trailing slash if present
                 normalized = normalized.replace(/\/$/, '');
@@ -831,45 +1175,9 @@ example.org"></textarea>
                 // Create results container
                 const resultsContainer = document.createElement('div');
                 resultsContainer.className = 'results-container';
+                
                 resultsArea.appendChild(summary);
                 resultsArea.appendChild(resultsContainer);
-                
-                // Display database sites table
-                const databaseSection = document.createElement('div');
-                databaseSection.className = 'database-sites';
-                databaseSection.innerHTML = `<h3>Database Sites</h3>`;
-                
-                // Create table for database sites
-                const databaseTable = document.createElement('table');
-                const databaseUrls = extractValidUrls(databaseSitesTextarea.value.trim());
-                
-                databaseTable.innerHTML = `
-                    <thead>
-                        <tr>
-                            <th>URL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${databaseUrls.map(url => `<tr><td>${url}</td></tr>`).join('')}
-                    </tbody>
-                `;
-                
-                const copyDatabaseBtn = document.createElement('button');
-                copyDatabaseBtn.textContent = 'Copy Database Sites';
-                copyDatabaseBtn.style.width = '140px';
-                copyDatabaseBtn.style.fontSize = '0.85em';
-                copyDatabaseBtn.style.padding = '6px 10px';
-                copyDatabaseBtn.style.margin = '5px auto';
-                copyDatabaseBtn.addEventListener('click', function() {
-                    navigator.clipboard.writeText(databaseUrls.join('\n'))
-                        .then(() => showNotification('Database sites copied to clipboard'))
-                        .catch(err => showNotification('Failed to copy: ' + err));
-                });
-                
-                databaseSection.appendChild(databaseTable);
-                databaseSection.appendChild(copyDatabaseBtn);
-                
-                resultsContainer.appendChild(databaseSection);
                 
                 // Display new sites table (sites not in database)
                 if (filtered.length > 0) {

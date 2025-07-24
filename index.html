@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website Shooter</title>
+    <title>Website Loader</title>
     <style>
         :root {
             --bg-color: #1e1e1e;
@@ -12,6 +12,7 @@
             --border-color: #444;
             --button-bg: #4CAF50;
             --button-hover: #45a049;
+            --warning-color: #f44336;
             --good-table-bg: rgba(144, 238, 144, 0.1);
             --irrelevant-table-bg: rgba(255, 182, 193, 0.1);
             --table-header-bg: #333;
@@ -27,6 +28,7 @@
             --border-color: #ddd;
             --button-bg: #4CAF50;
             --button-hover: #45a049;
+            --warning-color: #f44336;
             --good-table-bg: rgba(144, 238, 144, 0.2);
             --irrelevant-table-bg: rgba(255, 182, 193, 0.2);
             --table-header-bg: #f2f2f2;
@@ -106,34 +108,7 @@
         input:checked + .slider:before {
             transform: translateX(30px);
         }
-        .london-time {
-            position: absolute;
-            top: 10px;
-            right: 250px;
-            background-color: var(--card-bg);
-            padding: 8px 15px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            border: 1px solid var(--border-color);
-            z-index: 100;
-        }
-        .london-time h3 {
-            color: var(--text-color);
-            margin: 0;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: normal;
-        }
-        .timer {
-            font-size: 20px;
-            font-weight: 500;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            color: var(--text-color);
-            letter-spacing: 1px;
-        }
+
         .input-section {
             background-color: var(--card-bg);
             padding: 20px;
@@ -224,6 +199,58 @@
             background-color: var(--button-hover);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* Sleek minimalistic action buttons */
+        .action-btn {
+            padding: 4px 8px;
+            font-size: 10px;
+            border-radius: 3px;
+            border: 1px solid;
+            background: var(--card-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            margin: 0 1px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            opacity: 0.9;
+            min-width: 45px;
+        }
+        
+        .action-btn:hover {
+            opacity: 1;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+        
+        .move-btn {
+            border-color: #ff9800;
+            color: #fff;
+            background-color: #ff9800;
+        }
+        
+        .move-btn:hover {
+            background-color: #f57c00;
+        }
+        
+        .remove-btn {
+            border-color: #f44336;
+            color: #fff;
+            background-color: #f44336;
+        }
+        
+        .remove-btn:hover {
+            background-color: #d32f2f;
+        }
+        
+        .move-good-btn {
+            border-color: #4caf50;
+            color: #fff;
+            background-color: #4caf50;
+        }
+        
+        .move-good-btn:hover {
+            background-color: #388e3c;
         }
         textarea {
             width: 100%;
@@ -377,7 +404,6 @@
             border-color: #4CAF50;
         }
         
-        /* London time is now positioned at the top right */
         /* The best-time class is kept for backward compatibility */
         .best-time {
             display: none; /* Hide the old timer position */
@@ -387,10 +413,7 @@
 <body>
     <div id="notification" class="notification"></div>
     <div class="container">
-        <div class="london-time">
-            <h3>London Time</h3>
-            <div class="timer" id="timer">00:00:00</div>
-        </div>
+
         <div class="theme-toggle">
             <span style="color: var(--text-color);">Dark</span>
             <label class="switch">
@@ -398,24 +421,24 @@
                 <span class="slider"></span>
             </label>
             <span style="color: var(--text-color);">Light</span>
+            <button id="reset-button" style="background-color: var(--warning-color); color: white; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer; font-size: 0.85em; margin-left: 15px;">Reset All Data</button>
         </div>
         
 
-        <h1>Website Shooter</h1>
+        <h1>Website Loader</h1>
         
         <div class="nav-links">
             <a href="index.html" class="active">Main Tool</a>
             <a href="compare.html">Compare & Filter</a>
-            <button id="reset-button" class="nav-reset-button">Reset All Data</button>
         </div>
         
         <div class="shortcut-info">
             <p>Keyboard shortcuts:</p>
             <ul>
-                <li><span class="shortcut-key" style="border: 1px solid #FFB74D; color: #FFB74D; background-color: rgba(255, 183, 77, 0.1);">Ctrl + Q</span> - <span style="color: #FFB74D;">Open current site in a new tab</span></li>
-                <li><span class="shortcut-key" style="border: 1px solid #81C784; color: #81C784; background-color: rgba(129, 199, 132, 0.1);">Ctrl + A</span> - <span style="color: #81C784;">Add to Good Sites</span></li>
-                <li><span class="shortcut-key" style="border: 1px solid #EF9A9A; color: #EF9A9A; background-color: rgba(239, 154, 154, 0.1);">Ctrl + S</span> - <span style="color: #EF9A9A;">Add to Irrelevant Sites</span></li>
-
+                <li><span class="shortcut-key" style="border: 1px solid #FFB74D; color: #FFB74D; background-color: rgba(255, 183, 77, 0.1);">Ctrl/Cmd + Q</span> - <span style="color: #FFB74D;">Open current site in a new tab</span></li>
+                <li><span class="shortcut-key" style="border: 1px solid #81C784; color: #81C784; background-color: rgba(129, 199, 132, 0.1);">Ctrl/Cmd + A</span> - <span style="color: #81C784;">Add to Good Sites (Non-live)</span></li>
+                <li><span class="shortcut-key" style="border: 1px solid #4CAF50; color: #4CAF50; background-color: rgba(76, 175, 80, 0.1);">Ctrl/Cmd + E</span> - <span style="color: #4CAF50;">Add to Good Sites (Live)</span></li>
+                <li><span class="shortcut-key" style="border: 1px solid #EF9A9A; color: #EF9A9A; background-color: rgba(239, 154, 154, 0.1);">Ctrl/Cmd + S</span> - <span style="color: #EF9A9A;">Add to Irrelevant Sites</span></li>
             </ul>
         </div>
         
@@ -433,9 +456,10 @@ https://another-example.com"></textarea>
             <div class="controls">
                 <button id="next-site">Next Site</button>
                 <button id="next-and-open" style="background-color: #FFB74D;">Next Site & Open</button>
-                <button id="open-site" style="background-color: #FFB74D;">Open Site (Ctrl+Q)</button>
-                <button id="add-good" style="background-color: #81C784;">Add to Good (Ctrl+A)</button>
-                <button id="add-irrelevant" style="background-color: #EF9A9A;">Add to Irrelevant (Ctrl+S)</button>
+                <button id="open-site" style="background-color: #FFB74D;">Open Site (Ctrl/Cmd+Q)</button>
+                <button id="add-good" style="background-color: #81C784;">Add to Good Non-live (Ctrl/Cmd+A)</button>
+                <button id="add-good-live" style="background-color: #4CAF50;">Add to Good Live (Ctrl/Cmd+E)</button>
+                <button id="add-irrelevant" style="background-color: #EF9A9A;">Add to Irrelevant (Ctrl/Cmd+S)</button>
             </div>
         </div>
         
@@ -446,6 +470,7 @@ https://another-example.com"></textarea>
                     <thead>
                         <tr>
                             <th>URL</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -487,6 +512,7 @@ https://another-example.com"></textarea>
                     <tr>
                         <th>URL</th>
                         <th>Type</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -507,9 +533,6 @@ https://another-example.com"></textarea>
             let irrelevantSites = [];
             let combinedSites = []; // Array to store sites in chronological order with type info
             
-            // London time variables
-            let clockInterval;
-            
             // DOM elements
             const websiteInput = document.getElementById('website-input');
             const loadSitesBtn = document.getElementById('load-sites');
@@ -518,6 +541,7 @@ https://another-example.com"></textarea>
             const nextAndOpenBtn = document.getElementById('next-and-open');
             const openSiteBtn = document.getElementById('open-site');
             const addGoodBtn = document.getElementById('add-good');
+            const addGoodLiveBtn = document.getElementById('add-good-live');
             const addIrrelevantBtn = document.getElementById('add-irrelevant');
             const goodSitesTable = document.getElementById('good-sites-table').querySelector('tbody');
             const irrelevantSitesTable = document.getElementById('irrelevant-sites-table').querySelector('tbody');
@@ -528,8 +552,7 @@ https://another-example.com"></textarea>
             const showGoodBtn = document.getElementById('show-good');
             const showIrrelevantBtn = document.getElementById('show-irrelevant');
             
-            // Clock element
-            const timerElement = document.getElementById('timer');
+
             
             // Table action buttons
             const copyGoodSitesBtn = document.getElementById('copy-good-sites');
@@ -595,6 +618,11 @@ https://another-example.com"></textarea>
                 addToGoodSites();
             });
             
+            // Add to good sites as Live
+            addGoodLiveBtn.addEventListener('click', function() {
+                addToGoodSites('Live');
+            });
+            
             // Add to irrelevant sites
             addIrrelevantBtn.addEventListener('click', function() {
                 addToIrrelevantSites();
@@ -621,30 +649,38 @@ https://another-example.com"></textarea>
                         }
                     }
                     
-                    // Handle Ctrl key combinations with custom shortcuts and allow Ctrl+C and Ctrl+V
-                    if (event.ctrlKey) {
+                    // Handle Ctrl (Windows/Linux) and Cmd (Mac) key combinations
+                    if (event.ctrlKey || event.metaKey) {
+                        const modifierKey = event.metaKey ? 'Cmd' : 'Ctrl';
+                        
                         // Custom shortcuts
                         if (event.key === 'q' || event.key === 'Q') {
-                            // Ctrl+Q to open the loaded site
+                            // Ctrl+Q or Cmd+Q to open the loaded site
                             openCurrentSite();
                             showNotification('Opening current site');
                             event.preventDefault();
                             return false;
                         } else if (event.key === 'a' || event.key === 'A') {
-                            // Ctrl+A to add to good sites
-                            addToGoodSites();
-                            showNotification('Added to good sites');
+                            // Ctrl+A or Cmd+A to add to good sites as Non-live
+                            addToGoodSites('Non-live');
+                            showNotification('Added to good sites (Non-live)');
+                            event.preventDefault();
+                            return false;
+                        } else if (event.key === 'e' || event.key === 'E') {
+                            // Ctrl+E or Cmd+E to add to good sites as Live
+                            addToGoodSites('Live');
+                            showNotification('Added to good sites (Live)');
                             event.preventDefault();
                             return false;
                         } else if (event.key === 's' || event.key === 'S') {
-                            // Ctrl+S to add to irrelevant sites
+                            // Ctrl+S or Cmd+S to add to irrelevant sites
                             addToIrrelevantSites();
                             showNotification('Added to irrelevant sites');
                             event.preventDefault();
                             return false;
 
                         }
-                        // Allow Ctrl+C, Ctrl+V, Ctrl+F, and Ctrl+R
+                        // Allow Ctrl+C, Ctrl+V, Ctrl+F, and Ctrl+R (or Cmd equivalents on Mac)
                         else if (event.key === 'c' || event.key === 'C' || 
                                  event.key === 'v' || event.key === 'V' || 
                                  event.key === 'f' || event.key === 'F' || 
@@ -654,14 +690,14 @@ https://another-example.com"></textarea>
                         }
                         // Show notification for other prevented shortcuts
                         else if (event.key === 'w' || event.key === 'W') {
-                            showNotification('Ctrl+W (close tab) prevented - may not work in all browsers');
+                            showNotification(modifierKey + '+W (close tab) prevented - may not work in all browsers');
                         } else if (event.key === 'p' || event.key === 'P') {
-                            showNotification('Ctrl+P (print) prevented');
+                            showNotification(modifierKey + '+P (print) prevented');
                         } else {
-                            showNotification('Ctrl+' + event.key.toUpperCase() + ' prevented');
+                            showNotification(modifierKey + '+' + event.key.toUpperCase() + ' prevented');
                         }
                         
-                        // Prevent default for other Ctrl combinations
+                        // Prevent default for other Ctrl/Cmd combinations
                         event.preventDefault();
                         return false;
                     }
@@ -674,7 +710,7 @@ https://another-example.com"></textarea>
             window.addEventListener('focus', function() {
                 // This will trigger when user closes a tab with Ctrl+W and returns to this app
                 console.log('Window regained focus - user may have returned from a tab');
-                showNotification('Welcome back! Use Ctrl+A to mark as good or Ctrl+S for irrelevant');
+                showNotification('Welcome back! Use Ctrl/Cmd+A (Non-live), Ctrl/Cmd+E (Live), or Ctrl/Cmd+S (Irrelevant)');
             });
             
             // Notification system
@@ -726,19 +762,24 @@ https://another-example.com"></textarea>
                 }
             }
             
-            function addToGoodSites() {
+            function addToGoodSites(status = 'Non-live') {
                 if (currentIndex >= 0 && currentIndex < websites.length) {
                     const site = websites[currentIndex];
                     
                     // Check if site is already in good sites
-                    if (!goodSites.includes(site)) {
-                        goodSites.push(site);
+                    const existingSite = goodSites.find(item => item.url === site);
+                    if (!existingSite) {
+                        goodSites.push({
+                            url: site,
+                            status: status
+                        });
                         updateGoodSitesTable();
                         
                         // Add to combined sites with type info
                         combinedSites.push({
                             url: site,
-                            type: 'good'
+                            type: 'good',
+                            status: status
                         });
                         updateCombinedSitesTable();
                         
@@ -759,6 +800,14 @@ https://another-example.com"></textarea>
                         currentSiteDisplay.textContent = 'No site loaded';
                     }
                 }
+            }
+            
+            function addToGoodSitesLive() {
+                addToGoodSites('Live');
+            }
+            
+            function addToGoodSitesNonLive() {
+                addToGoodSites('Non-live');
             }
             
             function addToIrrelevantSites() {
@@ -799,26 +848,79 @@ https://another-example.com"></textarea>
             function updateGoodSitesTable() {
                 goodSitesTable.innerHTML = '';
                 
-                goodSites.forEach((site, index) => {
+                goodSites.forEach((siteObj, index) => {
                     const row = document.createElement('tr');
                     
                     const urlCell = document.createElement('td');
                     const urlLink = document.createElement('a');
-                    urlLink.href = site;
-                    urlLink.textContent = site;
+                    urlLink.href = siteObj.url;
+                    urlLink.textContent = siteObj.url;
                     urlLink.target = '_blank';
                     urlCell.appendChild(urlLink);
                     
+                    const statusCell = document.createElement('td');
+                    const statusSelect = document.createElement('select');
+                    statusSelect.innerHTML = '<option value="Live">Live</option><option value="Non-live">Non-live</option>';
+                    statusSelect.value = siteObj.status;
+                    statusSelect.addEventListener('change', function() {
+                        // Update the status in goodSites array
+                        goodSites[index].status = this.value;
+                        
+                        // Update combined sites array
+                        const combinedIndex = combinedSites.findIndex(item => item.url === siteObj.url && item.type === 'good');
+                        if (combinedIndex !== -1) {
+                            combinedSites[combinedIndex].status = this.value;
+                        }
+                        
+                        // Save to localStorage
+                        saveToLocalStorage();
+                        
+                        showNotification(`Status updated to ${this.value}`);
+                    });
+                    statusCell.appendChild(statusSelect);
+                    
                     const actionsCell = document.createElement('td');
+                    
+                    const swapBtn = document.createElement('button');
+                    swapBtn.textContent = 'Move';
+                    swapBtn.className = 'action-btn move-btn';
+                    swapBtn.title = 'Move to Bad';
+                    swapBtn.addEventListener('click', function() {
+                        // Remove from good sites
+                        goodSites.splice(index, 1);
+                        // Add to irrelevant sites
+                        irrelevantSites.push(siteObj.url);
+                        
+                        // Update combined sites array
+                        const combinedIndex = combinedSites.findIndex(item => item.url === siteObj.url && item.type === 'good');
+                        if (combinedIndex !== -1) {
+                            combinedSites[combinedIndex].type = 'irrelevant';
+                            delete combinedSites[combinedIndex].status; // Remove status for irrelevant sites
+                        }
+                        
+                        // Update tables
+                        updateGoodSitesTable();
+                        updateIrrelevantSitesTable();
+                        updateCombinedSitesTable();
+                        
+                        // Update localStorage
+                        saveToLocalStorage();
+                        
+                        showNotification('Site moved to irrelevant');
+                    });
+                    actionsCell.appendChild(swapBtn);
+                    
                     const removeBtn = document.createElement('button');
-                    removeBtn.textContent = 'Remove';
+                    removeBtn.textContent = 'Delete';
+                    removeBtn.className = 'action-btn remove-btn';
+                    removeBtn.title = 'Remove';
                     removeBtn.addEventListener('click', function() {
                         // Remove from good sites array
                         goodSites.splice(index, 1);
                         updateGoodSitesTable();
                         
                         // Remove from combined sites array
-                        const combinedIndex = combinedSites.findIndex(item => item.url === site && item.type === 'good');
+                        const combinedIndex = combinedSites.findIndex(item => item.url === siteObj.url && item.type === 'good');
                         if (combinedIndex !== -1) {
                             combinedSites.splice(combinedIndex, 1);
                             updateCombinedSitesTable();
@@ -830,6 +932,7 @@ https://another-example.com"></textarea>
                     actionsCell.appendChild(removeBtn);
                     
                     row.appendChild(urlCell);
+                    row.appendChild(statusCell);
                     row.appendChild(actionsCell);
                     goodSitesTable.appendChild(row);
                 });
@@ -852,8 +955,43 @@ https://another-example.com"></textarea>
                     urlCell.appendChild(urlLink);
                     
                     const actionsCell = document.createElement('td');
+                    
+                    const swapBtn = document.createElement('button');
+                    swapBtn.textContent = 'Move';
+                    swapBtn.className = 'action-btn move-good-btn';
+                    swapBtn.title = 'Move to Good';
+                    swapBtn.addEventListener('click', function() {
+                        // Remove from irrelevant sites
+                        irrelevantSites.splice(index, 1);
+                        // Add to good sites with default Non-live status
+                        goodSites.push({
+                            url: site,
+                            status: 'Non-live'
+                        });
+                        
+                        // Update combined sites array
+                        const combinedIndex = combinedSites.findIndex(item => item.url === site && item.type === 'irrelevant');
+                        if (combinedIndex !== -1) {
+                            combinedSites[combinedIndex].type = 'good';
+                            combinedSites[combinedIndex].status = 'Non-live';
+                        }
+                        
+                        // Update tables
+                        updateGoodSitesTable();
+                        updateIrrelevantSitesTable();
+                        updateCombinedSitesTable();
+                        
+                        // Update localStorage
+                        saveToLocalStorage();
+                        
+                        showNotification('Site moved to good');
+                    });
+                    actionsCell.appendChild(swapBtn);
+                    
                     const removeBtn = document.createElement('button');
-                    removeBtn.textContent = 'Remove';
+                    removeBtn.textContent = 'Delete';
+                    removeBtn.className = 'action-btn remove-btn';
+                    removeBtn.title = 'Remove';
                     removeBtn.addEventListener('click', function() {
                         // Remove from irrelevant sites array
                         irrelevantSites.splice(index, 1);
@@ -913,9 +1051,21 @@ https://another-example.com"></textarea>
                     typeCell.style.color = site.type === 'good' ? '#81C784' : '#EF9A9A';
                     typeCell.style.fontWeight = 'bold';
                     
+                    const statusCell = document.createElement('td');
+                    if (site.type === 'good' && site.status) {
+                        statusCell.textContent = site.status;
+                        statusCell.style.color = site.status === 'Live' ? '#4CAF50' : '#FF9800';
+                        statusCell.style.fontWeight = 'bold';
+                    } else {
+                        statusCell.textContent = '-';
+                        statusCell.style.color = '#999';
+                    }
+                    
                     const actionsCell = document.createElement('td');
                     const removeBtn = document.createElement('button');
-                    removeBtn.textContent = 'Remove';
+                    removeBtn.textContent = 'Delete';
+                    removeBtn.className = 'action-btn remove-btn';
+                    removeBtn.title = 'Remove';
                     removeBtn.addEventListener('click', function() {
                         // Remove from combined sites array
                         combinedSites.splice(index, 1);
@@ -944,6 +1094,7 @@ https://another-example.com"></textarea>
                     
                     row.appendChild(urlCell);
                     row.appendChild(typeCell);
+                    row.appendChild(statusCell);
                     row.appendChild(actionsCell);
                     combinedSitesTable.appendChild(row);
                 });
@@ -952,32 +1103,18 @@ https://another-example.com"></textarea>
                 saveToLocalStorage();
             }
             
-            // London time function
-            function updateLondonTime() {
-                const options = { 
-                    timeZone: 'Europe/London',
-                    hour: '2-digit', 
-                    minute: '2-digit', 
-                    second: '2-digit',
-                    hour12: false
-                };
-                
-                const londonTime = new Date().toLocaleTimeString('en-GB', options);
-                timerElement.textContent = londonTime;
-            }
-            
-            // Update London time every second
-            function startLondonClock() {
-                // Update immediately
-                updateLondonTime();
-                
-                // Then update every second
-                clockInterval = setInterval(updateLondonTime, 1000);
-            }
+
             
             // Table action functions
             function copyTableToClipboard(sites) {
-                const text = sites.join('\n');
+                let text;
+                if (sites === goodSites) {
+                    // Format good sites as "url / status"
+                    text = sites.map(site => `${site.url} / ${site.status}`).join('\n');
+                } else {
+                    // For irrelevant sites, just join as before
+                    text = sites.join('\n');
+                }
                 navigator.clipboard.writeText(text)
                     .then(() => {
                         showNotification('Table copied to clipboard');
@@ -1057,9 +1194,6 @@ https://another-example.com"></textarea>
                     websiteInput.value = savedSitesTextareaContent;
                 }
             }
-            
-            // Start the London clock
-            startLondonClock();
             
             // Load saved data
             loadFromLocalStorage();
@@ -1153,17 +1287,27 @@ https://another-example.com"></textarea>
                 // Get current filter
                 const currentFilter = document.querySelector('.filter-btn.active').id;
                 
-                // Filter sites based on current filter
-                let sitesToCopy = [];
+                let textToCopy = '';
+                
                 if (currentFilter === 'show-all') {
-                    sitesToCopy = combinedSites.map(site => site.url);
+                    // Include both sections with headers
+                    const goodSitesText = goodSites.length > 0 ? 'Good Sites:\n' + goodSites.map(site => `${site.url} / ${site.status}`).join('\n') : '';
+                    const irrelevantSitesText = irrelevantSites.length > 0 ? 'Irrelevant Sites:\n' + irrelevantSites.join('\n') : '';
+                    
+                    textToCopy = [goodSitesText, irrelevantSitesText].filter(section => section !== '').join('\n\n');
                 } else if (currentFilter === 'show-good') {
-                    sitesToCopy = combinedSites.filter(site => site.type === 'good').map(site => site.url);
+                    textToCopy = 'Good Sites:\n' + goodSites.map(site => `${site.url} / ${site.status}`).join('\n');
                 } else if (currentFilter === 'show-irrelevant') {
-                    sitesToCopy = combinedSites.filter(site => site.type === 'irrelevant').map(site => site.url);
+                    textToCopy = 'Irrelevant Sites:\n' + irrelevantSites.join('\n');
                 }
                 
-                copyTableToClipboard(sitesToCopy);
+                navigator.clipboard.writeText(textToCopy)
+                    .then(() => {
+                        showNotification('Table copied to clipboard with sections');
+                    })
+                    .catch(err => {
+                        showNotification('Failed to copy: ' + err);
+                    });
             });
             
             // Filter button event listeners
