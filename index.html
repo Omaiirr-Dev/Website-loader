@@ -283,6 +283,24 @@
             transform: translateY(0);
         }
         
+        /* Reset button styles */
+        .nav-reset-button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+            margin-left: auto;
+            display: inline-block;
+        }
+        
+        .nav-reset-button:hover {
+            background-color: #c0392b;
+        }
+        
         .table-actions {
             margin-top: 15px;
             display: flex;
@@ -381,11 +399,14 @@
             </label>
             <span style="color: var(--text-color);">Light</span>
         </div>
+        
+
         <h1>Website Shooter</h1>
         
         <div class="nav-links">
             <a href="index.html" class="active">Main Tool</a>
             <a href="compare.html">Compare & Filter</a>
+            <button id="reset-button" class="nav-reset-button">Reset All Data</button>
         </div>
         
         <div class="shortcut-info">
@@ -526,6 +547,11 @@ https://another-example.com"></textarea>
                 windowHasFocus = false;
             });
             
+            // Save website input in real-time
+            websiteInput.addEventListener('input', function() {
+                localStorage.setItem('sitesTextareaContent', websiteInput.value);
+            });
+            
             // Load sites from input
             loadSitesBtn.addEventListener('click', function() {
                 const input = websiteInput.value.trim();
@@ -545,6 +571,7 @@ https://another-example.com"></textarea>
                 if (websites.length > 0) {
                     currentIndex = 0;
                     updateCurrentSiteDisplay();
+                    saveToLocalStorage(); // Save the current state
                 }
             });
             
@@ -974,6 +1001,17 @@ https://another-example.com"></textarea>
                 localStorage.setItem('goodSites', JSON.stringify(goodSites));
                 localStorage.setItem('irrelevantSites', JSON.stringify(irrelevantSites));
                 localStorage.setItem('combinedSites', JSON.stringify(combinedSites));
+                
+                // Save websites array and current index
+                if (websites.length > 0) {
+                    localStorage.setItem('websites', JSON.stringify(websites));
+                    localStorage.setItem('currentIndex', currentIndex);
+                }
+                
+                // Save current site textarea content
+                if (sitesTextarea.value) {
+                    localStorage.setItem('sitesTextareaContent', sitesTextarea.value);
+                }
             }
             
             // Function to load data from localStorage
@@ -981,6 +1019,9 @@ https://another-example.com"></textarea>
                 const savedGoodSites = localStorage.getItem('goodSites');
                 const savedIrrelevantSites = localStorage.getItem('irrelevantSites');
                 const savedCombinedSites = localStorage.getItem('combinedSites');
+                const savedWebsites = localStorage.getItem('websites');
+                const savedCurrentIndex = localStorage.getItem('currentIndex');
+                const savedSitesTextareaContent = localStorage.getItem('sitesTextareaContent');
                 
                 if (savedGoodSites) {
                     goodSites = JSON.parse(savedGoodSites);
@@ -996,6 +1037,25 @@ https://another-example.com"></textarea>
                     combinedSites = JSON.parse(savedCombinedSites);
                     updateCombinedSitesTable();
                 }
+                
+                // Load websites and current index
+                if (savedWebsites) {
+                    websites = JSON.parse(savedWebsites);
+                    
+                    if (savedCurrentIndex) {
+                        currentIndex = parseInt(savedCurrentIndex);
+                    }
+                    
+                    // Update current site display if websites exist
+                    if (websites.length > 0 && currentIndex < websites.length) {
+                        updateCurrentSiteDisplay();
+                    }
+                }
+                
+                // Load sites textarea content
+                if (savedSitesTextareaContent) {
+                    sitesTextarea.value = savedSitesTextareaContent;
+                }
             }
             
             // Start the London clock
@@ -1003,6 +1063,43 @@ https://another-example.com"></textarea>
             
             // Load saved data
             loadFromLocalStorage();
+            
+            // Reset button functionality
+            document.getElementById('reset-button').addEventListener('click', function() {
+                // Save theme preference before clearing localStorage
+                const currentTheme = localStorage.getItem('theme');
+                
+                // Clear localStorage except theme
+                localStorage.removeItem('goodSites');
+                localStorage.removeItem('irrelevantSites');
+                localStorage.removeItem('combinedSites');
+                localStorage.removeItem('websites');
+                localStorage.removeItem('currentIndex');
+                localStorage.removeItem('sitesTextareaContent');
+                
+                // Restore theme preference
+                if (currentTheme) {
+                    localStorage.setItem('theme', currentTheme);
+                }
+                
+                // Reset data arrays
+                goodSites = [];
+                irrelevantSites = [];
+                combinedSites = [];
+                websites = [];
+                currentIndex = -1;
+                
+                // Clear UI
+                sitesTextarea.value = '';
+                
+                // Update tables
+                updateGoodSitesTable();
+                updateIrrelevantSitesTable();
+                updateCombinedSitesTable();
+                updateCurrentSiteDisplay();
+                
+                showNotification('All data has been reset');
+            });
             
             // Theme toggle functionality
             const themeSwitch = document.getElementById('theme-switch');

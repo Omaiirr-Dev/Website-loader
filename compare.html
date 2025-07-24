@@ -189,6 +189,23 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.12);
         }
         
+        .nav-reset-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background-color 0.3s ease;
+            margin-left: auto;
+            display: inline-block;
+        }
+        
+        .nav-reset-button:hover {
+            background-color: #d32f2f;
+        }
+        
         table {
             width: 100%;
             max-width: 450px;
@@ -351,12 +368,15 @@
             <span style="color: var(--text-color);">Light</span>
         </div>
         
+
+        
         <h1>Website Filter Tool</h1>
         <p>Check a list of sites against your database to identify which ones are already known and which ones are new.</p>
         
         <div class="nav-links">
             <a href="index.html">Main Tool</a>
             <a href="compare.html" class="active">Compare & Filter</a>
+            <button id="reset-button" class="nav-reset-button">Reset All Data</button>
         </div>
         
         <div class="input-container">
@@ -446,17 +466,119 @@ example.org"></textarea>
                 }
             });
             
-            // Auto-load combined sites from localStorage if available
+            // Reset button functionality
+            const resetButton = document.getElementById('reset-button');
+            resetButton.addEventListener('click', function() {
+                // Clear localStorage data except theme preference
+                const theme = localStorage.getItem('theme');
+                localStorage.removeItem('databaseSites');
+                localStorage.removeItem('compareSites');
+                localStorage.removeItem('compareResults');
+                localStorage.removeItem('combinedSites'); // Also clear legacy data
+                if (theme) {
+                    localStorage.setItem('theme', theme); // Preserve theme setting
+                }
+                
+                // Clear textareas
+                databaseSitesTextarea.value = '';
+                compareSitesTextarea.value = '';
+                
+                // Clear results
+                resultsArea.innerHTML = `
+                    <p>After filtering, you'll see three tables:</p>
+                    <ul>
+                        <li><strong>Database Sites</strong> - All sites in your database</li>
+                        <li><strong>Detected Sites</strong> - URLs that were found in your database</li>
+                        <li><strong>New Sites</strong> - URLs that are not in your database</li>
+                    </ul>
+                `;
+                
+                showNotification('All data has been reset', 3000);
+            });
+            
+            // Auto-load saved data from localStorage if available
             window.addEventListener('load', function() {
-                const combinedSites = JSON.parse(localStorage.getItem('combinedSites') || '[]');
-                if (combinedSites.length > 0) {
-                    const urls = combinedSites.map(site => site.url);
-                    databaseSitesTextarea.value = urls.join('\n');
+                // Load database sites
+                const savedDatabaseSites = localStorage.getItem('databaseSites');
+                if (savedDatabaseSites) {
+                    databaseSitesTextarea.value = savedDatabaseSites;
+                } else {
+                    // Fallback to combined sites if databaseSites not found (for backward compatibility)
+                    const combinedSites = JSON.parse(localStorage.getItem('combinedSites') || '[]');
+                    if (combinedSites.length > 0) {
+                        const urls = combinedSites.map(site => site.url);
+                        databaseSitesTextarea.value = urls.join('\n');
+                    }
+                }
+                
+                // Add input event listener to save database sites in real-time
+                databaseSitesTextarea.addEventListener('input', function() {
+                    localStorage.setItem('databaseSites', databaseSitesTextarea.value);
+                });
+                
+                // Load sites to check
+                const savedCompareSites = localStorage.getItem('compareSites');
+                if (savedCompareSites) {
+                    compareSitesTextarea.value = savedCompareSites;
+                }
+                
+                // Load previous results if available
+                const savedResults = localStorage.getItem('compareResults');
+                if (savedResults) {
+                    resultsArea.innerHTML = savedResults;
+                    // Reattach event listeners to copy buttons
+                    reattachCopyButtonListeners();
                 }
                 
                 // Set up real-time filtering for the Sites to Check textarea
                 setupRealTimeFiltering();
             });
+            
+            // Function to reattach event listeners to copy buttons in saved results
+            function reattachCopyButtonListeners() {
+                // Find all copy buttons in the results area
+                const copyButtons = resultsArea.querySelectorAll('button');
+                
+                copyButtons.forEach(button => {
+                    // Remove existing listeners to avoid duplicates
+                    const newButton = button.cloneNode(true);
+                    button.parentNode.replaceChild(newButton, button);
+                    
+                    // Add new listener based on button text
+                    if (newButton.textContent === 'Copy Database Sites') {
+                        newButton.addEventListener('click', function() {
+                            const databaseUrls = extractValidUrls(databaseSitesTextarea.value.trim());
+                            navigator.clipboard.writeText(databaseUrls.join('\n'))
+                                .then(() => showNotification('Database sites copied to clipboard'))
+                                .catch(err => showNotification('Failed to copy: ' + err));
+                        });
+                    } else if (newButton.textContent === 'Copy New Sites') {
+                        newButton.addEventListener('click', function() {
+                            // Extract URLs from the table
+                            const newSitesTable = resultsArea.querySelector('.new-sites table');
+                            if (newSitesTable) {
+                                const urls = Array.from(newSitesTable.querySelectorAll('tbody tr td'))
+                                    .map(td => td.textContent);
+                                navigator.clipboard.writeText(urls.join('\n'))
+                                    .then(() => showNotification('New sites copied to clipboard'))
+                                    .catch(err => showNotification('Failed to copy: ' + err));
+                            }
+                        });
+                    } else if (newButton.textContent === 'Copy Detected Sites') {
+                        newButton.addEventListener('click', function() {
+                            // Extract URLs from the table
+                            const detectedSitesTable = resultsArea.querySelector('.detected-sites table');
+                            if (detectedSitesTable) {
+                                const urls = Array.from(detectedSitesTable.querySelectorAll('tbody tr td'))
+                                    .map(td => td.textContent);
+                                navigator.clipboard.writeText(urls.join('\n'))
+                                    .then(() => showNotification('Detected sites copied to clipboard'))
+                                    .catch(err => showNotification('Failed to copy: ' + err));
+                            }
+                        });
+                    }
+                });
+            }
             
             // Function to set up real-time filtering for the Sites to Check textarea
             function setupRealTimeFiltering() {
@@ -486,12 +608,15 @@ example.org"></textarea>
                 }
                 
                 // Add event listeners for input events (typing, pasting, etc.)
-                compareSitesTextarea.addEventListener('input', function() {
-                    // Clear any existing timeout to prevent multiple rapid executions
-                    if (filterTimeout) clearTimeout(filterTimeout);
-                    
-                    // Set a small timeout to avoid filtering on every keystroke
-                    filterTimeout = setTimeout(function() {
+            compareSitesTextarea.addEventListener('input', function() {
+                // Clear any existing timeout to prevent multiple rapid executions
+                if (filterTimeout) clearTimeout(filterTimeout);
+                
+                // Save the current content to localStorage
+                localStorage.setItem('compareSites', compareSitesTextarea.value);
+                
+                // Set a small timeout to avoid filtering on every keystroke
+                filterTimeout = setTimeout(function() {
                         const currentText = compareSitesTextarea.value.trim();
                         if (currentText) {
                             // Extract valid URLs and update the textarea
@@ -655,6 +780,7 @@ example.org"></textarea>
                 
                 // Save to localStorage for future use
                 localStorage.setItem('databaseSites', databaseUrls.join('\n'));
+                localStorage.setItem('compareSites', compareUrls.join('\n'));
                 
                 // Display results
                 displayResults(matches, filtered, compareUrls);
@@ -677,6 +803,9 @@ example.org"></textarea>
             // Display results in the results area
             function displayResults(matches, filtered, originalUrls) {
                 resultsArea.innerHTML = '';
+                
+                // Save results to localStorage for future use
+                localStorage.setItem('compareResults', ''); // Clear first to avoid memory issues
                 
                 // Create summary
                 const summary = document.createElement('div');
@@ -826,6 +955,9 @@ example.org"></textarea>
                 }
                 
                 showNotification(`Filtering complete: ${filtered.length} new sites, ${matches.length} detected sites`);
+                
+                // Save results to localStorage for future use
+                localStorage.setItem('compareResults', resultsArea.innerHTML);
             }
         });
     </script>
