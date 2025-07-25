@@ -253,7 +253,7 @@
             background-color: #388e3c;
         }
         textarea {
-            width: 100%;
+            width: 95%;
             height: 150px;
             padding: 12px;
             border: 1px solid var(--border-color);
@@ -262,6 +262,8 @@
             font-family: inherit;
             background-color: var(--card-bg);
             color: var(--text-color);
+            display: block;
+            margin-bottom: 15px;
         }
         .shortcut-info {
             background-color: var(--shortcut-bg);
@@ -290,25 +292,7 @@
             display: inline-block;
         }
         
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: var(--notification-bg);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            z-index: 1000;
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: opacity 0.3s, transform 0.3s;
-        }
-        
-        .notification.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        /* Notification styles removed */
         
         /* Reset button styles */
         .nav-reset-button {
@@ -411,7 +395,7 @@
     </style>
 </head>
 <body>
-    <div id="notification" class="notification"></div>
+    <!-- Notification system removed -->
     <div class="container">
 
         <div class="theme-toggle">
@@ -422,6 +406,18 @@
             </label>
             <span style="color: var(--text-color);">Light</span>
             <button id="reset-button" style="background-color: var(--warning-color); color: white; border: none; border-radius: 4px; padding: 8px 15px; cursor: pointer; font-size: 0.85em; margin-left: 15px;">Reset All Data</button>
+            
+        </div>
+        
+        <!-- Compact Shortcuts Panel -->
+        <div class="shortcuts-panel" style="position: fixed; top: 20px; right: 20px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; font-size: 13px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); max-width: 220px; z-index: 1000;">
+            <div style="font-weight: bold; margin-bottom: 8px; color: var(--text-color); font-size: 14px; text-align: center;">⌨️ Shortcuts</div>
+            <div style="display: grid; gap: 4px; color: var(--text-color);">
+                <div><kbd style="background: rgba(255,183,77,0.2); color: #FFB74D; padding: 3px 6px; border-radius: 3px; font-size: 11px; font-weight: bold;">Ctrl+E</kbd> Open site</div>
+                <div><kbd style="background: rgba(129,199,132,0.2); color: #81C784; padding: 3px 6px; border-radius: 3px; font-size: 11px; font-weight: bold;">Ctrl+A</kbd> Good (Non-live)</div>
+                <div><kbd style="background: rgba(76,175,80,0.2); color: #4CAF50; padding: 3px 6px; border-radius: 3px; font-size: 11px; font-weight: bold;">Ctrl+D</kbd> Good (Live)</div>
+                <div><kbd style="background: rgba(239,154,154,0.2); color: #EF9A9A; padding: 3px 6px; border-radius: 3px; font-size: 11px; font-weight: bold;">Ctrl+S</kbd> Irrelevant</div>
+            </div>
         </div>
         
 
@@ -432,34 +428,44 @@
             <a href="compare.html">Compare & Filter</a>
         </div>
         
-        <div class="shortcut-info">
-            <p>Keyboard shortcuts:</p>
-            <ul>
-                <li><span class="shortcut-key" style="border: 1px solid #FFB74D; color: #FFB74D; background-color: rgba(255, 183, 77, 0.1);">Ctrl/Cmd + Q</span> - <span style="color: #FFB74D;">Open current site in a new tab</span></li>
-                <li><span class="shortcut-key" style="border: 1px solid #81C784; color: #81C784; background-color: rgba(129, 199, 132, 0.1);">Ctrl/Cmd + A</span> - <span style="color: #81C784;">Add to Good Sites (Non-live)</span></li>
-                <li><span class="shortcut-key" style="border: 1px solid #4CAF50; color: #4CAF50; background-color: rgba(76, 175, 80, 0.1);">Ctrl/Cmd + E</span> - <span style="color: #4CAF50;">Add to Good Sites (Live)</span></li>
-                <li><span class="shortcut-key" style="border: 1px solid #EF9A9A; color: #EF9A9A; background-color: rgba(239, 154, 154, 0.1);">Ctrl/Cmd + S</span> - <span style="color: #EF9A9A;">Add to Irrelevant Sites</span></li>
-            </ul>
-        </div>
+
         
         <div class="input-section">
-            <h2>Add Websites</h2>
-            <p>Enter one URL per line (up to 50 sites):</p>
+            <h2>Step 1: Load Sites</h2>
+            <p>Enter one URL per line:</p>
             <textarea id="website-input" placeholder="https://example.com
 https://another-example.com"></textarea>
+            
             <button id="load-sites">Load Sites</button>
+        </div>
+        
+        <div style="margin: 20px 0; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--card-bg); box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="margin: 0 0 15px 0; color: var(--text-color); font-size: 1.3em;">Step 2: Smart Filter System (Optional)</h2>
+            <p style="margin: 0 0 15px 0; color: var(--text-color); font-size: 14px; background-color: rgba(76, 175, 80, 0.1); padding: 10px; border-radius: 5px; border-left: 4px solid #4CAF50;"><strong>Instructions:</strong> Use the filters below to automatically move unwanted sites to the irrelevant section.</p>
+            <div style="margin-bottom: 12px;">
+                <label for="filter-words" style="display: block; margin-bottom: 8px; color: var(--text-color); font-weight: 500;">Filter words (comma-separated):</label>
+                <input type="text" id="filter-words" placeholder="hello, spam, bad, unwanted" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--input-bg); color: var(--text-color); font-size: 14px; box-sizing: border-box;">
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px;">
+                <button id="manual-filter" style="padding: 8px 16px; background-color: #ccc; color: #666; border: none; border-radius: 4px; cursor: not-allowed; font-size: 14px; font-weight: 500;" disabled>Filter Sites</button>
+                <button id="adult-filter" style="padding: 8px 16px; background-color: #ccc; color: #666; border: none; border-radius: 4px; cursor: not-allowed; font-size: 14px; font-weight: 500;" disabled>Filter Adult Content</button>
+            </div>
+            <div id="filter-status" style="font-size: 12px; color: #888; font-style: italic;">Ready to filter loaded sites</div>
         </div>
         
         <div class="current-site">
             <h2>Current Site</h2>
+            <div id="site-counter" style="text-align: center; margin-bottom: 15px;">
+                <div style="color: #FF0000; font-size: 20px; font-weight: bold;">
+                    Remaining: <span id="remaining-sites">0</span>
+                </div>
+            </div>
             <div id="current-site-display" class="site-display">No site loaded</div>
             <div class="controls">
-                <button id="next-site">Next Site</button>
-                <button id="next-and-open" style="background-color: #FFB74D;">Next Site & Open</button>
-                <button id="open-site" style="background-color: #FFB74D;">Open Site (Ctrl/Cmd+Q)</button>
+                <button id="open-site" style="background-color: #FFB74D;">Open Site (Ctrl/Cmd+E)</button>
                 <button id="add-good" style="background-color: #81C784;">Add to Good Non-live (Ctrl/Cmd+A)</button>
-                <button id="add-good-live" style="background-color: #4CAF50;">Add to Good Live (Ctrl/Cmd+E)</button>
                 <button id="add-irrelevant" style="background-color: #EF9A9A;">Add to Irrelevant (Ctrl/Cmd+S)</button>
+                <button id="add-good-live" style="background-color: #4CAF50;">Add to Good Live (Ctrl/Cmd+D)</button>
             </div>
         </div>
         
@@ -483,7 +489,14 @@ https://another-example.com"></textarea>
             </div>
             
             <div class="table-container">
-                <h2>Irrelevant Sites</h2>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                    <h2 style="margin: 0;">Irrelevant Sites</h2>
+                    <button id="scroll-to-bottom" style="background-color: #2196F3; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3); transition: all 0.2s ease;" onmouseover="this.style.backgroundColor='#1976D2'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(33, 150, 243, 0.4)'" onmouseout="this.style.backgroundColor='#2196F3'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(33, 150, 243, 0.3)'">⬇ Scroll to Bottom</button>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label for="irrelevant-label" style="margin-right: 10px;">Custom Label:</label>
+                    <input type="text" id="irrelevant-label" placeholder="Irrelevant" value="Irrelevant" style="padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 3px; background-color: var(--card-bg); color: var(--text-color); width: 120px;">
+                </div>
                 <table id="irrelevant-sites-table">
                     <thead>
                         <tr>
@@ -524,6 +537,7 @@ https://another-example.com"></textarea>
         </div>
     </div>
 
+    <script src="adult_content_detector.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // State variables
@@ -532,20 +546,30 @@ https://another-example.com"></textarea>
             let goodSites = [];
             let irrelevantSites = [];
             let combinedSites = []; // Array to store sites in chronological order with type info
+            let sequenceCounter = 1; // Global counter for maintaining chronological order
+            let siteSequenceMap = new Map(); // Maps site URLs to their original sequence numbers
             
             // DOM elements
             const websiteInput = document.getElementById('website-input');
             const loadSitesBtn = document.getElementById('load-sites');
+            const filterWordsInput = document.getElementById('filter-words');
+            const manualFilterBtn = document.getElementById('manual-filter');
+            const adultFilterBtn = document.getElementById('adult-filter');
+
+            const filterStatus = document.getElementById('filter-status');
             const currentSiteDisplay = document.getElementById('current-site-display');
-            const nextSiteBtn = document.getElementById('next-site');
-            const nextAndOpenBtn = document.getElementById('next-and-open');
+
             const openSiteBtn = document.getElementById('open-site');
             const addGoodBtn = document.getElementById('add-good');
             const addGoodLiveBtn = document.getElementById('add-good-live');
             const addIrrelevantBtn = document.getElementById('add-irrelevant');
+            const irrelevantLabelInput = document.getElementById('irrelevant-label');
             const goodSitesTable = document.getElementById('good-sites-table').querySelector('tbody');
             const irrelevantSitesTable = document.getElementById('irrelevant-sites-table').querySelector('tbody');
             const combinedSitesTable = document.getElementById('combined-sites-table').querySelector('tbody');
+            
+            // Counter element
+            const remainingSitesCounter = document.getElementById('remaining-sites');
             
             // Filter buttons
             const showAllBtn = document.getElementById('show-all');
@@ -560,6 +584,7 @@ https://another-example.com"></textarea>
             const copyIrrelevantSitesBtn = document.getElementById('copy-irrelevant-sites');
             const clearIrrelevantSitesBtn = document.getElementById('clear-irrelevant-sites');
             const copyCombinedSitesBtn = document.getElementById('copy-combined-sites');
+            const scrollToBottomBtn = document.getElementById('scroll-to-bottom');
             
             // Track window focus for better tab management
             let windowHasFocus = true;
@@ -575,38 +600,290 @@ https://another-example.com"></textarea>
                 localStorage.setItem('sitesTextareaContent', websiteInput.value);
             });
             
+            // Update live counter function
+            function updateSiteCounter() {
+                const remainingSites = websites.length; // All sites in the websites array are remaining to be processed
+                remainingSitesCounter.textContent = remainingSites;
+            }
+            
+            // New robust filtering system
+            function updateFilterStatus() {
+                if (filterWordsInput.value.trim()) {
+                    filterStatus.textContent = `Filter ready: "${filterWordsInput.value.trim()}"`;
+                    filterStatus.style.color = '#4CAF50';
+                } else {
+                    filterStatus.textContent = 'Enter filter words to begin';
+                    filterStatus.style.color = '#888';
+                }
+            }
+            
+            function performFiltering() {
+                 const filterWords = filterWordsInput.value.trim();
+                 if (!filterWords) {
+                     return;
+                 }
+                 
+                 const words = filterWords.toLowerCase().split(',')
+                     .map(word => word.trim())
+                     .filter(word => word !== '');
+                 
+                 if (words.length === 0) {
+                     return;
+                 }
+                 
+                 const currentText = websiteInput.value.trim();
+                 if (!currentText) {
+                     return;
+                 }
+                 
+                 const lines = currentText.split('\n')
+                     .map(line => line.trim())
+                     .filter(line => line !== '');
+                 
+                 const filteredOut = [];
+                 const remaining = [];
+                 
+                 // Process each line with its original position-based sequence number
+                 lines.forEach((line, index) => {
+                     const lineLower = line.toLowerCase();
+                     const shouldFilter = words.some(word => lineLower.includes(word));
+                     
+                     if (shouldFilter) {
+                         // Add to irrelevant sites with sequence number based on original position
+                         if (!irrelevantSites.includes(line)) {
+                             irrelevantSites.push(line);
+                             combinedSites.push({
+                                 url: line,
+                                 type: 'irrelevant',
+                                 sequence: sequenceCounter + index // Use original position
+                             });
+                         }
+                         filteredOut.push(line);
+                     } else {
+                         remaining.push(line);
+                     }
+                 });
+                 
+                 // Update sequence counter to account for all processed lines
+                 sequenceCounter += lines.length;
+                 
+                 // Update the textarea with remaining sites
+                 websiteInput.value = remaining.join('\n');
+                 
+                 // Update websites array to match the filtered textarea content
+                 websites = remaining.slice(); // Copy the remaining sites
+                 
+                 // Update current site display to show first remaining site
+                 if (websites.length > 0) {
+                     currentIndex = 0;
+                     updateCurrentSiteDisplay();
+                     updateSiteCounter(); // Update live counter
+                 } else {
+                     currentIndex = -1;
+                     currentSiteDisplay.textContent = 'No sites remaining';
+                     updateSiteCounter(); // Update live counter
+                 }
+                 
+                 // Update tables
+                 updateIrrelevantSitesTable();
+                 updateCombinedSitesTable();
+                 
+                 // Save changes
+                 saveToLocalStorage();
+                 
+                 // Show results
+                 // Filtering completed silently
+             }
+            
+            // Save filter settings in real-time
+            filterWordsInput.addEventListener('input', function() {
+                localStorage.setItem('filterWords', this.value);
+                updateFilterStatus();
+            });
+            
+            // Manual filter button
+            manualFilterBtn.addEventListener('click', performFiltering);
+            
+            // Adult content filter functionality
+            function performAdultContentFiltering() {
+                const currentText = websiteInput.value.trim();
+                if (!currentText) {
+                    return;
+                }
+                
+                const lines = currentText.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line !== '');
+                
+                const filteredOut = [];
+                const remaining = [];
+                
+                // Initialize adult content detector with error handling
+                let detector;
+                try {
+                    detector = new AdultContentDetector();
+                    // ULTRA SENSITIVE threshold for maximum detection
+                    detector.setThreshold(3); // ULTRA SENSITIVE - catch everything
+                    console.log('Adult content detector initialized successfully with threshold:', detector.threshold);
+                    console.log('Total keywords loaded:', detector.adultKeywords.length);
+                    console.log('Total domains loaded:', detector.adultDomains.length);
+                } catch (error) {
+                    console.error('Failed to initialize adult content detector:', error);
+                    return;
+                }
+                
+                // Process each line with proper sequence numbering
+                lines.forEach((line, index) => {
+                    try {
+                        const result = detector.detectAdultContent(line);
+                        console.log(`🔍 Checking: ${line}`);
+                        console.log(`   Result: Adult=${result.isAdult}, Score=${result.score}, Confidence=${result.confidence}`);
+                        console.log(`   Keywords found: [${result.keywords.join(', ')}]`);
+                        console.log(`   Reasons: [${result.reasons.join(', ')}]`);
+                        
+                        if (result.isAdult) {
+                            console.log(`🔞 ADULT CONTENT DETECTED: ${line}`);
+                            // Use the original sequence from siteSequenceMap or calculate based on current position
+                            const originalSequence = siteSequenceMap.get(line) || (sequenceCounter + index);
+                            
+                            // Add to irrelevant sites with proper sequence number
+                            if (!irrelevantSites.includes(line)) {
+                                irrelevantSites.push(line);
+                                combinedSites.push({
+                                    url: line,
+                                    type: 'irrelevant',
+                                    sequence: originalSequence
+                                });
+                                console.log(`✅ Added ${line} to irrelevant sites with sequence ${originalSequence}`);
+                            }
+                            filteredOut.push(line);
+                        } else {
+                            remaining.push(line);
+                        }
+                    } catch (error) {
+                        console.error(`Error processing ${line}:`, error);
+                        // If there's an error, keep the site (don't filter it)
+                        remaining.push(line);
+                    }
+                });
+                
+                // Update sequence counter only if we processed new sites
+                if (lines.length > 0 && !siteSequenceMap.has(lines[0])) {
+                    sequenceCounter += lines.length;
+                }
+                
+                // Update the textarea with remaining sites
+                websiteInput.value = remaining.join('\n');
+                
+                // Update websites array to match the filtered textarea content
+                websites = remaining.slice(); // Copy the remaining sites
+                
+                // Update current site display to show first remaining site
+                 if (websites.length > 0) {
+                     currentIndex = 0;
+                     updateCurrentSiteDisplay();
+                     updateSiteCounter(); // Update live counter
+                 } else {
+                     currentIndex = -1;
+                     currentSiteDisplay.textContent = 'No sites remaining';
+                     updateSiteCounter(); // Update live counter
+                 }
+                
+                // Update tables
+                updateIrrelevantSitesTable();
+                updateCombinedSitesTable();
+                
+                // Save changes
+                saveToLocalStorage();
+                
+                // Adult content filtering completed silently
+                if (filteredOut.length > 0) {
+                    console.log('Filtered adult sites:', filteredOut);
+                    console.log('Remaining sites in queue:', websites.length);
+                } else {
+                    console.log('No adult content found in:', lines);
+                }
+            }
+            
+            // Adult filter button
+            adultFilterBtn.addEventListener('click', performAdultContentFiltering);
+            
+
+            
+            // Initialize filter status
+            updateFilterStatus();
+            
+            // Save custom irrelevant label and update table
+            irrelevantLabelInput.addEventListener('input', function() {
+                localStorage.setItem('irrelevantLabel', this.value);
+                updateCombinedSitesTable();
+            });
+            
             // Load sites from input
             loadSitesBtn.addEventListener('click', function() {
                 const input = websiteInput.value.trim();
-                if (!input) return;
+                if (!input) {
+                    return;
+                }
                 
-                websites = input.split('\n')
-                    .map(url => url.trim())
-                    .filter(url => url !== '')
-                    .map(url => {
+                // Parse all sites and assign sequence numbers IMMEDIATELY
+                const allSites = input.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line !== '')
+                    .map((site, index) => {
                         // Add https:// if no protocol is specified
-                        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                            return 'https://' + url;
+                        let processedUrl = site;
+                        if (!site.startsWith('http://') && !site.startsWith('https://')) {
+                            processedUrl = 'https://' + site;
                         }
-                        return url;
+                        
+                        return {
+                            url: processedUrl,
+                            originalUrl: site,
+                            originalSequence: sequenceCounter + index,
+                            isFiltered: false
+                        };
                     });
                 
-                if (websites.length > 0) {
-                    currentIndex = 0;
-                    updateCurrentSiteDisplay();
-                    saveToLocalStorage(); // Save the current state
+                if (allSites.length === 0) {
+                    return;
                 }
+                
+                // Store original sequence numbers in the map for later use
+                allSites.forEach(siteObj => {
+                    // Store both original URL and processed URL mappings
+                    siteSequenceMap.set(siteObj.originalUrl, siteObj.originalSequence);
+                    siteSequenceMap.set(siteObj.url, siteObj.originalSequence);
+                    console.log(`Mapped ${siteObj.originalUrl} to sequence ${siteObj.originalSequence}`);
+                });
+                console.log('Complete siteSequenceMap:', Array.from(siteSequenceMap.entries()));
+                
+                // Update sequence counter for future loads
+                sequenceCounter += allSites.length;
+                
+                // Set websites array to all loaded sites (no auto-filtering)
+                websites = allSites.map(siteObj => siteObj.url);
+                
+                // Enable filter buttons
+                manualFilterBtn.disabled = false;
+                manualFilterBtn.style.backgroundColor = '#FF9800';
+                manualFilterBtn.style.color = 'white';
+                manualFilterBtn.style.cursor = 'pointer';
+                
+                adultFilterBtn.disabled = false;
+                adultFilterBtn.style.backgroundColor = '#E91E63';
+                adultFilterBtn.style.color = 'white';
+                adultFilterBtn.style.cursor = 'pointer';
+                
+                // Set current index and display
+                currentIndex = 0;
+                updateCurrentSiteDisplay();
+                updateSiteCounter(); // Update live counter
+                
+                saveToLocalStorage(); // Save the current state
             });
             
-            // Next site button
-            nextSiteBtn.addEventListener('click', function() {
-                goToNextSite();
-            });
-            
-            // Next site and open button
-            nextAndOpenBtn.addEventListener('click', function() {
-                goToNextSiteAndOpen();
-            });
+
             
             // Open site in new tab
             openSiteBtn.addEventListener('click', function() {
@@ -654,28 +931,24 @@ https://another-example.com"></textarea>
                         const modifierKey = event.metaKey ? 'Cmd' : 'Ctrl';
                         
                         // Custom shortcuts
-                        if (event.key === 'q' || event.key === 'Q') {
-                            // Ctrl+Q or Cmd+Q to open the loaded site
+                        if (event.key === 'e' || event.key === 'E') {
+                            // Ctrl+E or Cmd+E to open the loaded site
                             openCurrentSite();
-                            showNotification('Opening current site');
                             event.preventDefault();
                             return false;
                         } else if (event.key === 'a' || event.key === 'A') {
                             // Ctrl+A or Cmd+A to add to good sites as Non-live
                             addToGoodSites('Non-live');
-                            showNotification('Added to good sites (Non-live)');
                             event.preventDefault();
                             return false;
-                        } else if (event.key === 'e' || event.key === 'E') {
-                            // Ctrl+E or Cmd+E to add to good sites as Live
+                        } else if (event.key === 'd' || event.key === 'D') {
+                            // Ctrl+D or Cmd+D to add to good sites as Live
                             addToGoodSites('Live');
-                            showNotification('Added to good sites (Live)');
                             event.preventDefault();
                             return false;
                         } else if (event.key === 's' || event.key === 'S') {
                             // Ctrl+S or Cmd+S to add to irrelevant sites
                             addToIrrelevantSites();
-                            showNotification('Added to irrelevant sites');
                             event.preventDefault();
                             return false;
 
@@ -688,13 +961,13 @@ https://another-example.com"></textarea>
                             // Let these pass through
                             return true;
                         }
-                        // Show notification for other prevented shortcuts
+                        // Prevent other shortcuts silently
                         else if (event.key === 'w' || event.key === 'W') {
-                            showNotification(modifierKey + '+W (close tab) prevented - may not work in all browsers');
+                            // Prevent close tab
                         } else if (event.key === 'p' || event.key === 'P') {
-                            showNotification(modifierKey + '+P (print) prevented');
+                            // Prevent print
                         } else {
-                            showNotification(modifierKey + '+' + event.key.toUpperCase() + ' prevented');
+                            // Prevent other shortcuts
                         }
                         
                         // Prevent default for other Ctrl/Cmd combinations
@@ -710,28 +983,9 @@ https://another-example.com"></textarea>
             window.addEventListener('focus', function() {
                 // This will trigger when user closes a tab with Ctrl+W and returns to this app
                 console.log('Window regained focus - user may have returned from a tab');
-                showNotification('Welcome back! Use Ctrl/Cmd+A (Non-live), Ctrl/Cmd+E (Live), or Ctrl/Cmd+S (Irrelevant)');
             });
             
-            // Notification system
-            const notification = document.getElementById('notification');
-            let notificationTimeout;
-            
-            function showNotification(message, duration = 3000) {
-                // Clear any existing timeout
-                if (notificationTimeout) {
-                    clearTimeout(notificationTimeout);
-                }
-                
-                // Set message and show notification
-                notification.textContent = message;
-                notification.classList.add('show');
-                
-                // Hide after duration
-                notificationTimeout = setTimeout(function() {
-                    notification.classList.remove('show');
-                }, duration);
-            }
+            // Notification system removed - all notifications are now silent
             
             // Helper functions
             function goToNextSite() {
@@ -775,11 +1029,13 @@ https://another-example.com"></textarea>
                         });
                         updateGoodSitesTable();
                         
-                        // Add to combined sites with type info
+                        // Add to combined sites with type info and original sequence number
+                        const originalSequence = siteSequenceMap.get(site) || sequenceCounter++;
                         combinedSites.push({
                             url: site,
                             type: 'good',
-                            status: status
+                            status: status,
+                            sequence: originalSequence
                         });
                         updateCombinedSitesTable();
                         
@@ -794,10 +1050,12 @@ https://another-example.com"></textarea>
                             currentIndex = 0;
                         }
                         updateCurrentSiteDisplay();
+                        updateSiteCounter(); // Update live counter
                     } else {
                         websites = [];
                         currentIndex = -1;
                         currentSiteDisplay.textContent = 'No site loaded';
+                        updateSiteCounter(); // Update live counter
                     }
                 }
             }
@@ -819,11 +1077,15 @@ https://another-example.com"></textarea>
                         irrelevantSites.push(site);
                         updateIrrelevantSitesTable();
                         
-                        // Add to combined sites with type info
+                        // Add to combined sites with type info and original sequence number
+                        const originalSequence = siteSequenceMap.get(site) || sequenceCounter++;
+                        console.log(`Adding ${site} to irrelevant with sequence ${originalSequence}`);
                         combinedSites.push({
                             url: site,
-                            type: 'irrelevant'
+                            type: 'irrelevant',
+                            sequence: originalSequence
                         });
+                        console.log('Current combinedSites:', combinedSites.map(s => ({url: s.url, seq: s.sequence, type: s.type})));
                         updateCombinedSitesTable();
                         
                         // Save to localStorage
@@ -837,10 +1099,12 @@ https://another-example.com"></textarea>
                             currentIndex = 0;
                         }
                         updateCurrentSiteDisplay();
+                        updateSiteCounter(); // Update live counter
                     } else {
                         websites = [];
                         currentIndex = -1;
                         currentSiteDisplay.textContent = 'No site loaded';
+                        updateSiteCounter(); // Update live counter
                     }
                 }
             }
@@ -863,19 +1127,22 @@ https://another-example.com"></textarea>
                     statusSelect.innerHTML = '<option value="Live">Live</option><option value="Non-live">Non-live</option>';
                     statusSelect.value = siteObj.status;
                     statusSelect.addEventListener('change', function() {
-                        // Update the status in goodSites array
+                        // Update the status in the goodSites array
                         goodSites[index].status = this.value;
                         
-                        // Update combined sites array
+                        // Update the status in the combinedSites array
                         const combinedIndex = combinedSites.findIndex(item => item.url === siteObj.url && item.type === 'good');
                         if (combinedIndex !== -1) {
                             combinedSites[combinedIndex].status = this.value;
                         }
                         
+                        // Refresh the combined sites table to show the change
+                        updateCombinedSitesTable();
+                        
                         // Save to localStorage
                         saveToLocalStorage();
                         
-                        showNotification(`Status updated to ${this.value}`);
+                        // Status updated silently
                     });
                     statusCell.appendChild(statusSelect);
                     
@@ -1034,6 +1301,9 @@ https://another-example.com"></textarea>
                     filteredSites = combinedSites.filter(site => site.type === 'irrelevant');
                 }
                 
+                // Sort by sequence number to maintain chronological order
+                filteredSites.sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
+                
                 // Create table rows
                 filteredSites.forEach((site, index) => {
                     const row = document.createElement('tr');
@@ -1047,7 +1317,8 @@ https://another-example.com"></textarea>
                     urlCell.appendChild(urlLink);
                     
                     const typeCell = document.createElement('td');
-                    typeCell.textContent = site.type === 'good' ? 'Good' : 'Irrelevant';
+                    const customLabel = irrelevantLabelInput.value.trim() || 'Irrelevant';
+                    typeCell.textContent = site.type === 'good' ? 'Good' : customLabel;
                     typeCell.style.color = site.type === 'good' ? '#81C784' : '#EF9A9A';
                     typeCell.style.fontWeight = 'bold';
                     
@@ -1109,10 +1380,16 @@ https://another-example.com"></textarea>
             function copyTableToClipboard(sites) {
                 let text;
                 if (sites === goodSites) {
-                    // Format good sites as "url / status"
-                    text = sites.map(site => `${site.url} / ${site.status}`).join('\n');
+                    // Format good sites with headers
+                    const header = 'URL\tStatus';
+                    const rows = sites.map(site => `${site.url}\t${site.status}`);
+                    text = header + '\n' + rows.join('\n');
+                } else if (sites === irrelevantSites) {
+                    // Format irrelevant sites with header
+                    const header = 'URL';
+                    text = header + '\n' + sites.join('\n');
                 } else {
-                    // For irrelevant sites, just join as before
+                    // For other cases, just join as before
                     text = sites.join('\n');
                 }
                 navigator.clipboard.writeText(text)
@@ -1129,7 +1406,7 @@ https://another-example.com"></textarea>
                     sitesArray.length = 0; // Clear the array
                     updateFunction();
                     saveToLocalStorage(); // Save changes to localStorage
-                    showNotification('Table cleared');
+                    // Table cleared silently
                 }
             }
             
@@ -1138,6 +1415,9 @@ https://another-example.com"></textarea>
                 localStorage.setItem('goodSites', JSON.stringify(goodSites));
                 localStorage.setItem('irrelevantSites', JSON.stringify(irrelevantSites));
                 localStorage.setItem('combinedSites', JSON.stringify(combinedSites));
+                localStorage.setItem('sequenceCounter', sequenceCounter);
+                localStorage.setItem('siteSequenceMap', JSON.stringify(Array.from(siteSequenceMap.entries())));
+                localStorage.setItem('irrelevantLabel', irrelevantLabelInput.value);
                 
                 // Save websites array and current index
                 if (websites.length > 0) {
@@ -1156,9 +1436,13 @@ https://another-example.com"></textarea>
                 const savedGoodSites = localStorage.getItem('goodSites');
                 const savedIrrelevantSites = localStorage.getItem('irrelevantSites');
                 const savedCombinedSites = localStorage.getItem('combinedSites');
+                const savedSequenceCounter = localStorage.getItem('sequenceCounter');
                 const savedWebsites = localStorage.getItem('websites');
                 const savedCurrentIndex = localStorage.getItem('currentIndex');
                 const savedSitesTextareaContent = localStorage.getItem('sitesTextareaContent');
+                const savedIrrelevantLabel = localStorage.getItem('irrelevantLabel');
+                const savedFilterWords = localStorage.getItem('filterWords');
+                const savedSiteSequenceMap = localStorage.getItem('siteSequenceMap');
                 
                 if (savedGoodSites) {
                     goodSites = JSON.parse(savedGoodSites);
@@ -1173,6 +1457,23 @@ https://another-example.com"></textarea>
                 if (savedCombinedSites) {
                     combinedSites = JSON.parse(savedCombinedSites);
                     updateCombinedSitesTable();
+                }
+                
+                // Load sequence counter
+                if (savedSequenceCounter) {
+                    sequenceCounter = parseInt(savedSequenceCounter);
+                } else {
+                    // If no saved counter, calculate next sequence based on existing sites
+                    const maxSequence = Math.max(0, ...combinedSites.map(site => site.sequence || 0));
+                    sequenceCounter = maxSequence + 1;
+                }
+                
+                // Load site sequence map
+                if (savedSiteSequenceMap) {
+                    const mapEntries = JSON.parse(savedSiteSequenceMap);
+                    siteSequenceMap = new Map(mapEntries);
+                } else {
+                    siteSequenceMap = new Map();
                 }
                 
                 // Load websites and current index
@@ -1193,30 +1494,47 @@ https://another-example.com"></textarea>
                 if (savedSitesTextareaContent) {
                     websiteInput.value = savedSitesTextareaContent;
                 }
+                
+                // Load custom irrelevant label
+                if (savedIrrelevantLabel) {
+                    irrelevantLabelInput.value = savedIrrelevantLabel;
+                }
+                
+                // Load filter settings
+                if (savedFilterWords) {
+                    filterWordsInput.value = savedFilterWords;
+                }
+                
+                // Update filter status after loading settings
+                updateFilterStatus();
             }
             
             // Load saved data
             loadFromLocalStorage();
             
+            // Initialize counter display
+            updateSiteCounter();
+            
             // Reset button functionality
             document.getElementById('reset-button').addEventListener('click', function() {
-                // Save theme preference and website input content before clearing localStorage
+                // Save theme preference before clearing localStorage
                 const currentTheme = localStorage.getItem('theme');
-                const websiteInputContent = websiteInput.value;
                 
                 // Clear localStorage except theme
                 localStorage.removeItem('goodSites');
                 localStorage.removeItem('irrelevantSites');
                 localStorage.removeItem('combinedSites');
+                localStorage.removeItem('sequenceCounter');
+                localStorage.removeItem('siteSequenceMap');
                 localStorage.removeItem('websites');
                 localStorage.removeItem('currentIndex');
+                localStorage.removeItem('sitesTextareaContent');
+                localStorage.removeItem('filterWords');
+                localStorage.removeItem('irrelevantLabel');
                 
-                // Restore theme preference and website input content
+                // Restore theme preference
                 if (currentTheme) {
                     localStorage.setItem('theme', currentTheme);
-                }
-                if (websiteInputContent) {
-                    localStorage.setItem('sitesTextareaContent', websiteInputContent);
                 }
                 
                 // Reset data arrays
@@ -1225,17 +1543,23 @@ https://another-example.com"></textarea>
                 combinedSites = [];
                 websites = [];
                 currentIndex = -1;
+                sequenceCounter = 1; // Reset sequence counter
+                siteSequenceMap = new Map(); // Reset sequence map
                 
-                // Keep the website input content
-                // Don't clear websiteInput.value
+                // Clear all input boxes
+                websiteInput.value = '';
+                filterWordsInput.value = '';
+                irrelevantLabelInput.value = '';
                 
-                // Update tables
+                // Update tables and display
                 updateGoodSitesTable();
                 updateIrrelevantSitesTable();
                 updateCombinedSitesTable();
                 updateCurrentSiteDisplay();
+                updateFilterStatus();
+                updateSiteCounter(); // Update live counter
                 
-                showNotification('Tables and processed data have been reset');
+                // All data and input boxes have been reset silently
             });
             
             // Theme toggle functionality
@@ -1286,27 +1610,42 @@ https://another-example.com"></textarea>
             copyCombinedSitesBtn.addEventListener('click', function() {
                 // Get current filter
                 const currentFilter = document.querySelector('.filter-btn.active').id;
+                const customLabel = irrelevantLabelInput.value.trim() || 'Irrelevant';
                 
                 let textToCopy = '';
                 
                 if (currentFilter === 'show-all') {
-                    // Include both sections with headers
-                    const goodSitesText = goodSites.length > 0 ? 'Good Sites:\n' + goodSites.map(site => `${site.url} / ${site.status}`).join('\n') : '';
-                    const irrelevantSitesText = irrelevantSites.length > 0 ? 'Irrelevant Sites:\n' + irrelevantSites.join('\n') : '';
+                    // Create full table with headers
+                    const header = 'URL\tType\tStatus';
+                    const rows = [];
                     
-                    textToCopy = [goodSitesText, irrelevantSitesText].filter(section => section !== '').join('\n\n');
+                    // Add good sites
+                    goodSites.forEach(site => {
+                        rows.push(`${site.url}\tGood\t${site.status}`);
+                    });
+                    
+                    // Add irrelevant sites
+                    irrelevantSites.forEach(site => {
+                        rows.push(`${site}\t${customLabel}\t-`);
+                    });
+                    
+                    textToCopy = header + '\n' + rows.join('\n');
                 } else if (currentFilter === 'show-good') {
-                    textToCopy = 'Good Sites:\n' + goodSites.map(site => `${site.url} / ${site.status}`).join('\n');
+                    const header = 'URL\tType\tStatus';
+                    const rows = goodSites.map(site => `${site.url}\tGood\t${site.status}`);
+                    textToCopy = header + '\n' + rows.join('\n');
                 } else if (currentFilter === 'show-irrelevant') {
-                    textToCopy = 'Irrelevant Sites:\n' + irrelevantSites.join('\n');
+                    const header = 'URL\tType\tStatus';
+                    const rows = irrelevantSites.map(site => `${site}\t${customLabel}\t-`);
+                    textToCopy = header + '\n' + rows.join('\n');
                 }
                 
                 navigator.clipboard.writeText(textToCopy)
                     .then(() => {
-                        showNotification('Table copied to clipboard with sections');
+                        console.log('Complete table copied to clipboard');
                     })
                     .catch(err => {
-                        showNotification('Failed to copy: ' + err);
+                        console.log('Failed to copy: ' + err);
                     });
             });
             
@@ -1324,6 +1663,15 @@ https://another-example.com"></textarea>
             showIrrelevantBtn.addEventListener('click', function() {
                 setActiveFilter(this);
                 updateCombinedSitesTable();
+            });
+            
+            // Scroll to bottom button event listener
+            scrollToBottomBtn.addEventListener('click', function() {
+                const combinedSitesContainer = document.querySelector('.combined-table-container');
+                combinedSitesContainer.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
             });
             
             function setActiveFilter(button) {
