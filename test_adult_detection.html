@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Adult Content Detection Test</title>
+</head>
+<body>
+    <h1>Adult Content Detection Test</h1>
+    <div id="results"></div>
+    
+    <script src="adult_content_detector.js"></script>
+    <script>
+        // Test sites
+        const testSites = [
+            'pornhub.com',
+            'xvideos.com',
+            'google.com',
+            'facebook.com',
+            'xxx-site.com',
+            'adult-content.xxx',
+            'hot-milf-videos.com',
+            'sexy-girls.net',
+            'hentai-anime.com',
+            'normal-website.com'
+        ];
+        
+        const detector = new AdultContentDetector();
+        const resultsDiv = document.getElementById('results');
+        
+        console.log('Testing adult content detection...');
+        
+        testSites.forEach(site => {
+            const result = detector.detectAdultContent(site);
+            const div = document.createElement('div');
+            div.style.margin = '10px 0';
+            div.style.padding = '10px';
+            div.style.border = '1px solid #ccc';
+            div.style.backgroundColor = result.isAdult ? '#ffebee' : '#e8f5e8';
+            
+            div.innerHTML = `
+                <strong>${site}</strong><br>
+                Adult: ${result.isAdult}<br>
+                Score: ${result.score}<br>
+                Confidence: ${result.confidence}<br>
+                Keywords: ${result.keywords.join(', ')}<br>
+                Reasons: ${result.reasons.join(', ')}
+            `;
+            
+            resultsDiv.appendChild(div);
+            
+            console.log(`${site}: Adult=${result.isAdult}, Score=${result.score}, Keywords=[${result.keywords.join(', ')}]`);
+        });
+    </script>
+</body>
+</html>

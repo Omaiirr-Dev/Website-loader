@@ -1004,7 +1004,19 @@ https://another-example.com"></textarea>
             
             function updateCurrentSiteDisplay() {
                 if (currentIndex >= 0 && currentIndex < websites.length) {
-                    currentSiteDisplay.textContent = websites[currentIndex];
+                    // Clear the display
+                    currentSiteDisplay.innerHTML = '';
+                    
+                    // Create a clickable link
+                    const urlLink = document.createElement('a');
+                    urlLink.href = websites[currentIndex];
+                    urlLink.textContent = websites[currentIndex];
+                    urlLink.target = '_blank';
+                    urlLink.style.color = 'var(--text-color)';
+                    urlLink.style.textDecoration = 'underline';
+                    urlLink.style.cursor = 'pointer';
+                    
+                    currentSiteDisplay.appendChild(urlLink);
                 } else {
                     currentSiteDisplay.textContent = 'No site loaded';
                 }
@@ -1612,33 +1624,29 @@ https://another-example.com"></textarea>
                 const currentFilter = document.querySelector('.filter-btn.active').id;
                 const customLabel = irrelevantLabelInput.value.trim() || 'Irrelevant';
                 
-                let textToCopy = '';
+                let filteredSites = [];
                 
+                // Filter sites based on current view
                 if (currentFilter === 'show-all') {
-                    // Create full table with headers
-                    const header = 'URL\tType\tStatus';
-                    const rows = [];
-                    
-                    // Add good sites
-                    goodSites.forEach(site => {
-                        rows.push(`${site.url}\tGood\t${site.status}`);
-                    });
-                    
-                    // Add irrelevant sites
-                    irrelevantSites.forEach(site => {
-                        rows.push(`${site}\t${customLabel}\t-`);
-                    });
-                    
-                    textToCopy = header + '\n' + rows.join('\n');
+                    filteredSites = combinedSites;
                 } else if (currentFilter === 'show-good') {
-                    const header = 'URL\tType\tStatus';
-                    const rows = goodSites.map(site => `${site.url}\tGood\t${site.status}`);
-                    textToCopy = header + '\n' + rows.join('\n');
+                    filteredSites = combinedSites.filter(site => site.type === 'good');
                 } else if (currentFilter === 'show-irrelevant') {
-                    const header = 'URL\tType\tStatus';
-                    const rows = irrelevantSites.map(site => `${site}\t${customLabel}\t-`);
-                    textToCopy = header + '\n' + rows.join('\n');
+                    filteredSites = combinedSites.filter(site => site.type === 'irrelevant');
                 }
+                
+                // Sort by sequence number to maintain chronological order (same as display)
+                filteredSites.sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
+                
+                // Create table content in the same order as displayed
+                const header = 'URL\tType\tStatus';
+                const rows = filteredSites.map(site => {
+                    const type = site.type === 'good' ? 'Good' : customLabel;
+                    const status = site.status || '-';
+                    return `${site.url}\t${type}\t${status}`;
+                });
+                
+                const textToCopy = header + '\n' + rows.join('\n');
                 
                 navigator.clipboard.writeText(textToCopy)
                     .then(() => {
