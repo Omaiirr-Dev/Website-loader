@@ -537,7 +537,7 @@ https://another-example.com"></textarea>
         </div>
     </div>
 
-    <script src="adult_content_detector.js"></script>
+    <script src="simple_adult_filter.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // State variables
@@ -705,103 +705,96 @@ https://another-example.com"></textarea>
             manualFilterBtn.addEventListener('click', performFiltering);
             
             // Adult content filter functionality
+            let adultFilter;
+            try {
+                adultFilter = new SimpleAdultFilter();
+            } catch (error) {
+                console.error('Failed to load adult content filter:', error);
+            }
+            
             function performAdultContentFiltering() {
-                const currentText = websiteInput.value.trim();
-                if (!currentText) {
+                if (!adultFilter) {
+                    console.log('Adult content filter not available');
                     return;
                 }
                 
-                const lines = currentText.split('\n')
+                const input = websiteInput.value.trim();
+                if (!input) {
+                    return;
+                }
+                
+                const lines = input.split('\n')
                     .map(line => line.trim())
                     .filter(line => line !== '');
+                
+                if (lines.length === 0) {
+                    return;
+                }
                 
                 const filteredOut = [];
                 const remaining = [];
                 
-                // Initialize adult content detector with error handling
-                let detector;
-                try {
-                    detector = new AdultContentDetector();
-                    // ULTRA SENSITIVE threshold for maximum detection
-                    detector.setThreshold(3); // ULTRA SENSITIVE - catch everything
-                    console.log('Adult content detector initialized successfully with threshold:', detector.threshold);
-                    console.log('Total keywords loaded:', detector.adultKeywords.length);
-                    console.log('Total domains loaded:', detector.adultDomains.length);
-                } catch (error) {
-                    console.error('Failed to initialize adult content detector:', error);
-                    return;
-                }
-                
-                // Process each line with proper sequence numbering
-                lines.forEach((line, index) => {
-                    try {
-                        const result = detector.detectAdultContent(line);
-                        console.log(`🔍 Checking: ${line}`);
-                        console.log(`   Result: Adult=${result.isAdult}, Score=${result.score}, Confidence=${result.confidence}`);
-                        console.log(`   Keywords found: [${result.keywords.join(', ')}]`);
-                        console.log(`   Reasons: [${result.reasons.join(', ')}]`);
-                        
-                        if (result.isAdult) {
-                            console.log(`🔞 ADULT CONTENT DETECTED: ${line}`);
-                            // Use the original sequence from siteSequenceMap or calculate based on current position
-                            const originalSequence = siteSequenceMap.get(line) || (sequenceCounter + index);
-                            
-                            // Add to irrelevant sites with proper sequence number
-                            if (!irrelevantSites.includes(line)) {
-                                irrelevantSites.push(line);
-                                combinedSites.push({
-                                    url: line,
-                                    type: 'irrelevant',
-                                    sequence: originalSequence
-                                });
-                                console.log(`✅ Added ${line} to irrelevant sites with sequence ${originalSequence}`);
-                            }
-                            filteredOut.push(line);
-                        } else {
-                            remaining.push(line);
-                        }
-                    } catch (error) {
-                        console.error(`Error processing ${line}:`, error);
-                        // If there's an error, keep the site (don't filter it)
+                lines.forEach(line => {
+                    let processedUrl = line;
+                    if (!line.startsWith('http://') && !line.startsWith('https://')) {
+                        processedUrl = 'https://' + line;
+                    }
+                    
+                    if (adultFilter.isAdultContent(processedUrl)) {
+                        filteredOut.push(line);
+                    } else {
                         remaining.push(line);
                     }
                 });
                 
-                // Update sequence counter only if we processed new sites
-                if (lines.length > 0 && !siteSequenceMap.has(lines[0])) {
-                    sequenceCounter += lines.length;
-                }
-                
-                // Update the textarea with remaining sites
+                // Update the textarea with clean sites
                 websiteInput.value = remaining.join('\n');
                 
-                // Update websites array to match the filtered textarea content
-                websites = remaining.slice(); // Copy the remaining sites
+                // Add filtered sites to irrelevant
+                filteredOut.forEach(site => {
+                    let processedUrl = site;
+                    if (!site.startsWith('http://') && !site.startsWith('https://')) {
+                        processedUrl = 'https://' + site;
+                    }
+                    
+                    if (!irrelevantSites.includes(processedUrl)) {
+                        irrelevantSites.push(processedUrl);
+                        
+                        const originalSequence = siteSequenceMap.get(processedUrl) || sequenceCounter++;
+                        combinedSites.push({
+                            url: processedUrl,
+                            type: 'irrelevant',
+                            sequence: originalSequence
+                        });
+                    }
+                });
                 
-                // Update current site display to show first remaining site
-                 if (websites.length > 0) {
-                     currentIndex = 0;
-                     updateCurrentSiteDisplay();
-                     updateSiteCounter(); // Update live counter
-                 } else {
-                     currentIndex = -1;
-                     currentSiteDisplay.textContent = 'No sites remaining';
-                     updateSiteCounter(); // Update live counter
-                 }
+                // Update websites array
+                websites = remaining.map(site => {
+                    if (!site.startsWith('http://') && !site.startsWith('https://')) {
+                        return 'https://' + site;
+                    }
+                    return site;
+                });
                 
-                // Update tables
+                // Update display
+                if (websites.length > 0) {
+                    currentIndex = 0;
+                    updateCurrentSiteDisplay();
+                    updateSiteCounter();
+                } else {
+                    currentIndex = -1;
+                    currentSiteDisplay.textContent = 'No sites remaining';
+                    updateSiteCounter();
+                }
+                
                 updateIrrelevantSitesTable();
                 updateCombinedSitesTable();
-                
-                // Save changes
                 saveToLocalStorage();
                 
-                // Adult content filtering completed silently
                 if (filteredOut.length > 0) {
                     console.log('Filtered adult sites:', filteredOut);
-                    console.log('Remaining sites in queue:', websites.length);
-                } else {
-                    console.log('No adult content found in:', lines);
+                    console.log('Remaining sites:', websites.length);
                 }
             }
             
